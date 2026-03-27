@@ -17,12 +17,14 @@ RUN npm install && npm run build
 ENV APACHE_DOCUMENT_ROOT=/var/www/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
 
+# FIX 1: Added bootstrap/cache and changed permissions to 775
 RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 # Change port to Render's required port
 RUN sed -i 's/80/10000/g' /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf
 
 EXPOSE 10000
 
-CMD ["apache2-foreground"]
+# FIX 2: Clear old cached settings right before Apache starts
+CMD php artisan optimize:clear && apache2-foreground
