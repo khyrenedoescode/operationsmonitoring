@@ -1476,31 +1476,141 @@ function confirmEmptyBin(){
 }
 
 /* ════════════════════════════════════════════════
-   ADD MODAL
+   ADD MODAL & ADD ROW LOGIC
 ════════════════════════════════════════════════ */
-function openModal(){document.getElementById('modal').classList.add('open');}
-function closeModal(){document.getElementById('modal').classList.remove('open');}
-async function addRow(){
-  const clientEl=document.getElementById('f-client'),client=clientEl.value.trim();
-  if(!client){clientEl.style.borderColor='var(--revision)';clientEl.focus();return;}
-  clientEl.style.borderColor='';
-  const payload={client,stage:document.getElementById('f-stage').value,prop_assign:document.getElementById('f-prop-assign').value.trim()||'—',prop_remark:document.getElementById('f-prop-remark').value.trim(),uiux_status:document.getElementById('f-uiux-status').value,uiux_assign:document.getElementById('f-uiux-assign').value.trim()||'—',fe:parseInt(document.getElementById('f-fe').value)||0,be:parseInt(document.getElementById('f-be').value)||0,dev_assign:document.getElementById('f-dev-assign').value.trim()||'—',dev_fe:document.getElementById('f-dev-fe').value,dev_be:document.getElementById('f-dev-be').value,status:document.getElementById('f-status').value,due:document.getElementById('f-due').value,final_remark:document.getElementById('f-final-remark').value.trim(),edited_by:'User'};
-  const res=await fetch(ROUTES.store,{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':CSRF,'Accept':'application/json'},body:JSON.stringify(payload)});
-  const data=await res.json();
-  if(data.success){
-    const r=data.row;
-    rows.push({id:r.id,client:r.client,tag:r.tag,stage:r.stage,prop_assign:r.prop_assign,prop_remark:r.prop_remark||'',uiux_status:r.uiux_status,uiux_assign:r.uiux_assign,dev_assign:r.dev_assign,dev_fe:r.dev_fe,dev_be:r.dev_be,fe:r.fe,be:r.be,status:r.status,due:r.due?r.due.replace(' 00:00:00',''):'',final_remark:r.final_remark||'',last_edited_by:'',last_edited_field:'',updated_at:'just now'});
-    closeModal();
-    ['f-client','f-prop-assign','f-uiux-assign','f-dev-assign','f-fe','f-be','f-due','f-prop-remark','f-final-remark'].forEach(id=>document.getElementById(id).value='');
-    renderTable();
-    setTimeout(()=>{const last=document.getElementById('row-'+(rows.length-1));if(last){last.classList.add('row-pulse');setTimeout(()=>last.classList.remove('row-pulse'),950);}},120);
-    // Add to log immediately for UI feedback
-    activityLog.unshift({type:'add', message: `Added new client: ${r.client}`, detail: `Stage: ${r.stage} · Status: ${r.status}`, ts: Date.now()});
-    updateLogBadge();
-    toast('Client added ✓');
-  } else {toast('Error saving — check console');console.error(data);}
+
+// Opens the Add Client Modal
+function openModal() {
+    document.getElementById('modal').classList.add('open');
 }
-document.getElementById('modal').addEventListener('click',e=>{if(e.target===e.currentTarget) closeModal();});
+
+// Closes the Add Client Modal
+function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+}
+
+// THE MAIN SAVE FUNCTION
+async function addRow() {
+    const clientEl = document.getElementById('f-client');
+    const client = clientEl.value.trim();
+
+    // Validation: Don't allow empty client names
+    if (!client) {
+        clientEl.style.borderColor = 'var(--revision)';
+        clientEl.focus();
+        return;
+    }
+    clientEl.style.borderColor = '';
+
+    // 1. Prepare the data to match your Laravel Controller
+    const payload = {
+        client: client,
+        stage: document.getElementById('f-stage').value,
+        prop_assign: document.getElementById('f-prop-assign').value.trim() || '—',
+        prop_remark: document.getElementById('f-prop-remark').value.trim() || '',
+        uiux_status: document.getElementById('f-uiux-status').value,
+        uiux_assign: document.getElementById('f-uiux-assign').value.trim() || '—',
+        fe: parseInt(document.getElementById('f-fe').value) || 0,
+        be: parseInt(document.getElementById('f-be').value) || 0,
+        dev_assign: document.getElementById('f-dev-assign').value.trim() || '—',
+        dev_fe: document.getElementById('f-dev-fe').value || '',
+        dev_be: document.getElementById('f-dev-be').value || '',
+        status: document.getElementById('f-status').value,
+        due: document.getElementById('f-due').value || null,
+        final_remark: document.getElementById('f-final-remark').value.trim() || '',
+        edited_by: 'User'
+    };
+
+    try {
+        // 2. FETCH CALL: Using absolute path '/operations' for Render compatibility
+        const res = await fetch('/operations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+            const r = data.row;
+
+            // 3. Update the local "rows" array so the table updates instantly
+            rows.push({
+                id: r.id,
+                client: r.client,
+                tag: r.tag,
+                stage: r.stage,
+                prop_assign: r.prop_assign,
+                prop_remark: r.prop_remark || '',
+                uiux_status: r.uiux_status,
+                uiux_assign: r.uiux_assign,
+                dev_assign: r.dev_assign,
+                dev_fe: r.dev_fe,
+                dev_be: r.dev_be,
+                fe: r.fe,
+                be: r.be,
+                status: r.status,
+                due: r.due ? r.due.replace(' 00:00:00', '') : '',
+                final_remark: r.final_remark || '',
+                last_edited_by: '',
+                last_edited_field: '',
+                updated_at: 'just now'
+            });
+
+            // 4. UI Cleanup
+            closeModal();
+            ['f-client', 'f-prop-assign', 'f-uiux-assign', 'f-dev-assign', 'f-fe', 'f-be', 'f-due', 'f-prop-remark', 'f-final-remark'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+
+            // 5. Re-draw the table and show animations
+            renderTable();
+            
+            setTimeout(() => {
+                const last = document.getElementById('row-' + (rows.length - 1));
+                if (last) {
+                    last.classList.add('row-pulse');
+                    setTimeout(() => last.classList.remove('row-pulse'), 950);
+                }
+            }, 120);
+
+            // 6. Update Activity Log and Toast
+            if (typeof activityLog !== 'undefined') {
+                activityLog.unshift({
+                    type: 'add',
+                    message: `Added new client: ${r.client}`,
+                    detail: `Stage: ${r.stage} · Status: ${r.status}`,
+                    ts: Date.now()
+                });
+                updateLogBadge();
+            }
+            
+            toast('Client added ✓');
+
+        } else {
+            // Error handling for validation (e.g., missing fields)
+            toast('Error saving — check console');
+            console.error('Server returned error:', data);
+            if (data.errors) {
+                alert("Validation Error: " + Object.values(data.errors).flat().join('\n'));
+            }
+        }
+    } catch (err) {
+        console.error('Fetch error:', err);
+        toast('Connection failed');
+        alert('Network Error: Could not reach the server. Check your Render logs.');
+    }
+}
+
+// Close modal when clicking outside of it (the gray background)
+document.getElementById('modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal();
+});
 
 /* ════════════════════════════════════════════════
    THEME
