@@ -1523,7 +1523,56 @@ function toast(msg){document.querySelector('.toast')?.remove();clearTimeout(toas
    INIT
 ════════════════════════════════════════════════ */
 renderTable();
-</script>
-<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+
+<script>
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        async function addRow() {
+            const btn = document.querySelector('.add-btn');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<span class="spinner"></span> Saving...';
+            btn.style.opacity = '0.7';
+            btn.disabled = true;
+
+            const clientData = {
+                client_name: "New Client", 
+                status: "On Hold",
+                uiux_status: "On Hold",
+                frontend_status: "In Progress",
+                backend_status: "In Progress"
+            };
+
+            try {
+                const response = await fetch('/operations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(clientData)
+                });
+
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    const errorData = await response.json();
+                    alert("Error: " + (errorData.message || "Could not save client"));
+                }
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                alert("Connection Error. Please check your internet.");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.style.opacity = '1';
+                btn.disabled = false;
+            }
+        }
+
+        document.querySelector('.add-btn').addEventListener('click', addRow);
+    </script>
+
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 </body>
 </html>
