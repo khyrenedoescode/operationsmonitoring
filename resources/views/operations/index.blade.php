@@ -740,6 +740,19 @@ tbody tr:hover .edit-hint{opacity:1;}
   </div>
 </div>
 
+<!-- ══ CONFIRM PERM DELETE MODAL ══ -->
+<div class="confirm-overlay" id="confirm-perm-delete-modal">
+  <div class="confirm-box">
+    <span class="bin-icon">⚠️</span>
+    <h3>Permanently Delete?</h3>
+    <p>This record will be gone forever.<br>This action cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="btn-confirm-cancel" onclick="closePermDeleteConfirm()">Cancel</button>
+      <button class="btn-confirm-delete" onclick="confirmPermDelete()">Delete Forever</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══ LOADING OVERLAY ══ -->
 <div class="loading-overlay" id="loading-overlay">
   <div class="loading-box">
@@ -1430,10 +1443,15 @@ document.getElementById('confirm-empty-bin-modal').addEventListener('click', e =
     if (e.target === e.currentTarget) closeEmptyBinConfirm();
 });
 
+document.getElementById('confirm-perm-delete-modal').addEventListener('click', e => {
+  if(e.target === e.currentTarget) closePermDeleteConfirm();
+});
+
 /* ════════════════════════════════════════════════
    RECYCLE BIN
 ════════════════════════════════════════════════ */
 let binLastSeenCount = parseInt(localStorage.getItem('binLastSeenCount') || '0');
+let pendingPermDeleteIdx = null;
 
 function updateBinBadge(){
   const badge=document.getElementById('bin-badge');
@@ -1511,20 +1529,39 @@ function restoreRow(ti){
 }
 
 function deletePermanently(ti){
-  if(!confirm('Permanently delete this record? This cannot be undone.')) return;
-  const card=document.getElementById('bin-card-'+ti);
-  if(card) card.style.animation='cardIn .3s ease reverse forwards';
-  setTimeout(async()=>{
-    const r=trash[ti];
+  pendingPermDeleteIdx = ti;
+  document.getElementById('confirm-perm-delete-modal').classList.add('open');
+}
+
+function closePermDeleteConfirm(){
+  pendingPermDeleteIdx = null;
+  document.getElementById('confirm-perm-delete-modal').classList.remove('open');
+}
+
+async function confirmPermDelete(){
+  if(pendingPermDeleteIdx === null) return;
+  const ti = pendingPermDeleteIdx;
+  closePermDeleteConfirm();
+
+  const card = document.getElementById('bin-card-'+ti);
+  if(card){
+    card.style.transition = 'opacity .3s ease, transform .3s ease';
+    card.style.opacity = '0';
+    card.style.transform = 'translateX(20px)';
+  }
+
+  setTimeout(async() => {
+    const r = trash[ti];
     const res = await fetch(ROUTES.force(r.id), {method:'DELETE', headers:{'X-CSRF-TOKEN':CSRF,'Accept':'application/json'}});
     if(res.ok){
       trash.splice(ti,1);
-      renderBin();updateBinBadge();
-      activityLog.unshift({type:'delete', message: `Permanently deleted ${r.client}`, ts: Date.now()});
+      renderBin();
+      updateBinBadge();
+      activityLog.unshift({type:'delete', message:`Permanently deleted ${r.client}`, ts: Date.now()});
       updateLogBadge();
       toast(`${r.client} permanently deleted`);
     }
-  },250);
+  }, 280);
 }
 
 // 1. Bubuksan ang warning modal kapag pinindot ang Empty Bin button
