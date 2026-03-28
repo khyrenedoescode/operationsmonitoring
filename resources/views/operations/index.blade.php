@@ -1039,62 +1039,109 @@ function exportXLSX(){
   }, 400);
 }
 
-function exportPDF(){
+async function exportPDF(){
   document.getElementById('export-dropdown').classList.remove('open');
   showLoading('Generating PDF…');
-  setTimeout(() => {
-    const visible = rows.filter((_,i) => {
-      const tr = document.getElementById('row-'+i);
-      return !tr || tr.style.display !== 'none';
-    });
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    const bg = isDark ? '#1a1014' : '#fdf6f0';
-    const text = isDark ? '#f5e8e4' : '#3d2b22';
-    const border = isDark ? '#4a2e36' : '#e8d5c4';
-    const surface = isDark ? '#231519' : '#fff8f5';
 
-    const statusColor = s => s==='Done'?'#5a9a6a':s==='On Hold'?'#b08020':'#c96070';
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
-    const tableRows = visible.map(r => `
-      <tr>
-        <td>${escHtml(r.client)}<br><small style="color:#a08070">${escHtml(r.tag||'')}</small></td>
-        <td>${escHtml(r.stage)}</td>
-        <td>${escHtml(r.prop_assign||'—')}</td>
-        <td>${escHtml(r.uiux_assign||'—')} (${r.uiux_status})</td>
-        <td>${escHtml(r.dev_assign||'—')}</td>
-        <td>FE: ${r.fe||0}% / BE: ${r.be||0}%</td>
-        <td><span style="background:${statusColor(r.status)}22;color:${statusColor(r.status)};padding:2px 8px;border-radius:5px;font-size:.75rem;font-weight:600;">${escHtml(r.status)}</span></td>
-        <td>${r.due||'—'}</td>
-      </tr>
-    `).join('');
+  const visible = rows.filter((_,i) => {
+    const tr = document.getElementById('row-'+i);
+    return !tr || tr.style.display !== 'none';
+  });
 
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
-      <style>
-        body{font-family:'Poppins',Segoe UI,sans-serif;background:${bg};color:${text};padding:32px;margin:0;}
-        h1{font-size:1.5rem;font-weight:800;margin-bottom:4px;background:linear-gradient(135deg,#c9637a,#b07060);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-        .meta{font-size:.72rem;color:#a08070;margin-bottom:24px;}
-        table{width:100%;border-collapse:collapse;background:${surface};border-radius:10px;overflow:hidden;}
-        th{background:#F2E6D5;padding:10px 12px;font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:#7a5c50;text-align:left;border-bottom:2px solid ${border};}
-        td{padding:12px;font-size:.8rem;border-bottom:1px solid ${border};vertical-align:top;}
-        tr:last-child td{border-bottom:none;}
-        @media print{body{padding:16px;}h1{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
-      </style></head><body>
-      <h1>Operations Monitoring</h1>
-      <div class="meta">Exported on ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})} · ${visible.length} record${visible.length!==1?'s':''}</div>
-      <table>
-        <thead><tr><th>Client</th><th>Stage</th><th>Proposal</th><th>UI/UX</th><th>Dev</th><th>Progress</th><th>Status</th><th>Due Date</th></tr></thead>
-        <tbody>${tableRows}</tbody>
-      </table>
-      <script>window.onload=function(){window.print();window.onafterprint=function(){window.close();}}<\/script>
-      </body></html>`;
+  // ── Title & meta
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(16);
+  doc.setTextColor(201, 99, 122);
+  doc.text('Operations Monitoring', 14, 16);
 
-    const win = window.open('','_blank');
-    win.document.write(html);
-    win.document.close();
-    hideLoading();
-    logActivity('edit','Exported PDF',`${visible.length} records exported`);
-    toast('PDF ready — print dialog opened ✓');
-  }, 500);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8);
+  doc.setTextColor(160, 128, 112);
+  doc.text(`Exported ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})} · ${visible.length} record${visible.length!==1?'s':''}`, 14, 22);
+
+  // ── Table
+  const head = [['Client','Stage','Proposal','UI/UX Assigned','UI/UX Status','Dev Assigned','FE%','BE%','Status','Due Date']];
+  const body = visible.map(r => [
+    r.client + (r.tag ? `\n${r.tag}` : ''),
+    r.stage || '',
+    r.prop_assign || '—',
+    r.uiux_assign || '—',
+    r.uiux_status || '',
+    r.dev_assign || '—',
+    (r.fe || 0) + '%',
+    (r.be || 0) + '%',
+    r.status || '',
+    r.due || '—'
+  ]);
+
+  const statusColor = s => {
+    if(s === 'Done')       return [90, 154, 106];
+    if(s === 'On Hold')    return [176, 128, 32];
+    if(s === 'Revisions')  return [201, 96, 112];
+    return [160, 128, 112];
+  };
+
+  doc.autoTable({
+    head,
+    body,
+    startY: 27,
+    styles: {
+      font: 'helvetica',
+      fontSize: 7.5,
+      cellPadding: 3,
+      valign: 'middle',
+      overflow: 'linebreak',
+    },
+    headStyles: {
+      fillColor: [242, 230, 213],
+      textColor: [122, 92, 80],
+      fontStyle: 'bold',
+      fontSize: 7,
+    },
+    columnStyles: {
+      0: { cellWidth: 32 },
+      1: { cellWidth: 28 },
+      2: { cellWidth: 22 },
+      3: { cellWidth: 28 },
+      4: { cellWidth: 22 },
+      5: { cellWidth: 28 },
+      6: { cellWidth: 12 },
+      7: { cellWidth: 12 },
+      8: { cellWidth: 22 },
+      9: { cellWidth: 22 },
+    },
+    alternateRowStyles: { fillColor: [253, 246, 240] },
+    didDrawCell(data) {
+      // Color the Status column cells
+      if(data.section === 'body' && data.column.index === 8) {
+        const val = data.cell.raw;
+        const [r,g,b] = statusColor(val);
+        const { x, y, width, height } = data.cell;
+        doc.setFillColor(r, g, b, 0.12);
+        doc.setDrawColor(r, g, b);
+        doc.setLineWidth(0.3);
+        doc.roundedRect(x+1, y+1.5, width-2, height-3, 2, 2, 'FD');
+        doc.setTextColor(r, g, b);
+        doc.setFontSize(7);
+        doc.setFont('helvetica','bold');
+        doc.text(val, x + width/2, y + height/2, { align:'center', baseline:'middle' });
+      }
+    },
+    didParseCell(data) {
+      if(data.section === 'body' && data.column.index === 8) {
+        data.cell.styles.textColor = [255,255,255];
+        data.cell.styles.fillColor = [255,255,255];
+      }
+    }
+  });
+
+  hideLoading();
+  logActivity('edit', 'Exported PDF', `${visible.length} records exported`);
+  toast('PDF downloaded ✓');
+  doc.save(`operations_${new Date().toISOString().split('T')[0]}.pdf`);
 }
 
 function showLoading(msg='Loading…'){
@@ -1443,33 +1490,6 @@ function renderBin(){
   }).join('');
 }
 
-async function emptyBin() {
-    // 1. Magtatanong muna kung sure na buburahin
-    if (!confirm('Permanently delete all items in the Recycle Bin? This cannot be undone.')) return;
-
-    try {
-        // 2. Ise-send ang DELETE request sa backend/database
-        const res = await fetch('/operations/trash/empty', {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Accept': 'application/json'
-            }
-        });
-
-        // 3. Kapag naging successful, ire-reload ang page
-        if (res.ok) {
-            toast('Database: Recycle Bin emptied ✓');
-            location.reload(); 
-        } else {
-            toast('Failed to empty Recycle Bin.');
-        }
-    } catch (err) {
-        console.error('Error:', err);
-        toast('Connection error.');
-    }
-}
-
 function restoreRow(ti){
   const card=document.getElementById('bin-card-'+ti);
   if(card) card.style.animation='cardIn .3s ease reverse forwards';
@@ -1532,7 +1552,7 @@ async function confirmEmptyBin() {
         });
 
         if (res.ok) {
-            toast('Database: Recycle Bin emptied ✓');
+            toast('Recycle Bin emptied ✓');
             location.reload(); // Mag-rerefresh para malinis ang screen
         } else {
             toast('Failed to empty Recycle Bin.');
@@ -1703,5 +1723,7 @@ function toast(msg){document.querySelector('.toast')?.remove();clearTimeout(toas
 renderTable();
 </script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 </body>
 </html>
