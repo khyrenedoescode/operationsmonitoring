@@ -1441,21 +1441,30 @@ function renderBin(){
   }).join('');
 }
 
-async function confirmEmptyBin() {
-    // I-double check na ito ang tamang pangalan na tinatawag ng button mo
-    const res = await fetch('/operations/trash/empty', {
-        method: 'DELETE',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            'Accept': 'application/json'
-        }
-    });
+async function emptyBin() {
+    // 1. Magtatanong muna kung sure na buburahin
+    if (!confirm('Permanently delete all items in the Recycle Bin? This cannot be undone.')) return;
 
-    if (res.ok) {
-        toast('Database: Recycle Bin emptied ✓');
-        location.reload(); // I-reload para malinis ang table at mawala sila sa screen
-    } else {
-        toast('Failed to empty Recycle Bin.');
+    try {
+        // 2. Ise-send ang DELETE request sa backend/database
+        const res = await fetch('/operations/trash/empty', {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            }
+        });
+
+        // 3. Kapag naging successful, ire-reload ang page
+        if (res.ok) {
+            toast('Database: Recycle Bin emptied ✓');
+            location.reload(); 
+        } else {
+            toast('Failed to empty Recycle Bin.');
+        }
+    } catch (err) {
+        console.error('Error:', err);
+        toast('Connection error.');
     }
 }
 
