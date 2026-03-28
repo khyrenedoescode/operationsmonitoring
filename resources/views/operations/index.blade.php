@@ -1799,7 +1799,7 @@ function checkOverdueOnLoad(){
   today.setHours(0,0,0,0);
 
   const overdue = rows.filter(r => {
-    if(!r.due || r.status === 'Done') return false;
+    if(!r.due) return false;
     return new Date(r.due + 'T00:00:00') < today;
   });
 
