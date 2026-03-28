@@ -428,6 +428,26 @@ tbody tr:hover .edit-hint{opacity:1;}
 .loading-spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
 .loading-box p{font-size:.82rem;color:var(--muted);}
 
+/* ══ OVERDUE NOTIFICATION POPUP ══ */
+.overdue-popup{position:fixed;bottom:24px;left:24px;z-index:9998;background:var(--glass);backdrop-filter:blur(20px);border:1.5px solid rgba(201,96,112,.4);border-radius:16px;padding:18px 20px;max-width:320px;box-shadow:0 8px 32px rgba(201,96,112,.25);animation:toastIn .4s cubic-bezier(.22,1,.36,1);font-family:'Poppins',sans-serif;}
+.overdue-popup-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.overdue-popup-icon{font-size:1.4rem;animation:wobble .6s ease;}
+.overdue-popup-title{font-size:.85rem;font-weight:700;color:var(--revision);}
+.overdue-popup-body{font-size:.75rem;color:var(--muted);line-height:1.5;margin-bottom:14px;}
+.overdue-popup-body strong{color:var(--text);font-weight:600;}
+.overdue-popup-actions{display:flex;gap:8px;}
+.overdue-popup-dismiss{padding:7px 14px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--muted2);font-family:'Poppins',sans-serif;font-size:.72rem;font-weight:500;cursor:pointer;transition:all .2s;}
+.overdue-popup-dismiss:hover{background:var(--surface2);color:var(--text);}
+.overdue-popup-view{padding:7px 14px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--revision),#a03050);color:#fff;font-family:'Poppins',sans-serif;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s;box-shadow:0 3px 10px rgba(201,96,112,.3);}
+.overdue-popup-view:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(201,96,112,.4);}
+.overdue-list{list-style:none;margin-bottom:10px;display:flex;flex-direction:column;gap:4px;max-height:100px;overflow-y:auto;}
+.overdue-list li{font-size:.72rem;color:var(--text);padding:3px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;}
+.overdue-list li:last-child{border-bottom:none;}
+.overdue-list li::before{content:'⚠';font-size:.65rem;flex-shrink:0;}
+/* Row highlight */
+.row-overdue-highlight{animation:overdueGlow 1.5s ease 3;}
+@keyframes overdueGlow{0%,100%{box-shadow:inset 0 0 0 2px transparent;}50%{box-shadow:inset 0 0 0 2px var(--revision);background:rgba(201,96,112,.08);}}
+
 </style>
 </head>
 <body>
@@ -1772,9 +1792,83 @@ let toastTimer;
 function toast(msg){document.querySelector('.toast')?.remove();clearTimeout(toastTimer);const el=Object.assign(document.createElement('div'),{className:'toast',textContent:msg});document.body.appendChild(el);toastTimer=setTimeout(()=>el.remove(),2400);}
 
 /* ════════════════════════════════════════════════
+   OVERDUE POPUP ON LOAD
+════════════════════════════════════════════════ */
+function checkOverdueOnLoad(){
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  const overdue = rows.filter(r => {
+    if(!r.due || r.status === 'Done') return false;
+    return new Date(r.due + 'T00:00:00') < today;
+  });
+
+  if(overdue.length === 0) return;
+
+  const popup = document.createElement('div');
+  popup.className = 'overdue-popup';
+  popup.id = 'overdue-popup';
+
+  const listItems = overdue.slice(0, 5).map(r => `<li>${escHtml(r.client)}</li>`).join('');
+  const moreText = overdue.length > 5 ? `<div style="font-size:.68rem;color:var(--muted);margin-top:4px;">+${overdue.length - 5} more</div>` : '';
+
+  popup.innerHTML = `
+    <div class="overdue-popup-header">
+      <span class="overdue-popup-icon">⚠️</span>
+      <span class="overdue-popup-title">${overdue.length} Overdue Project${overdue.length > 1 ? 's' : ''}</span>
+    </div>
+    <div class="overdue-popup-body">
+      <ul class="overdue-list">${listItems}</ul>
+      ${moreText}
+      These projects have passed their due date.
+    </div>
+    <div class="overdue-popup-actions">
+      <button class="overdue-popup-dismiss" onclick="dismissOverduePopup()">Dismiss</button>
+      <button class="overdue-popup-view" onclick="viewOverdueProjects()">View Projects</button>
+    </div>
+  `;
+
+  document.body.appendChild(popup);
+}
+
+function dismissOverduePopup(){
+  const popup = document.getElementById('overdue-popup');
+  if(popup){
+    popup.style.transition = 'opacity .3s ease, transform .3s ease';
+    popup.style.opacity = '0';
+    popup.style.transform = 'translateY(10px)';
+    setTimeout(() => popup.remove(), 300);
+  }
+}
+
+function viewOverdueProjects(){
+  dismissOverduePopup();
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  // Scroll to table top first
+  document.querySelector('.table-wrap')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  setTimeout(() => {
+    rows.forEach((r, i) => {
+      if(!r.due || r.status === 'Done') return;
+      if(new Date(r.due + 'T00:00:00') < today){
+        const tr = document.getElementById('row-' + i);
+        if(tr){
+          tr.classList.add('row-overdue-highlight');
+          tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          setTimeout(() => tr.classList.remove('row-overdue-highlight'), 4500);
+        }
+      }
+    });
+  }, 400);
+}
+/* ════════════════════════════════════════════════
    INIT
 ════════════════════════════════════════════════ */
 renderTable();
+setTimeout(checkOverdueOnLoad, 800); // slight delay so table renders first
 </script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
