@@ -181,12 +181,24 @@ class OperationController extends Controller
         return response()->json(['success' => true]);
     }
 
-    /* ─── CLEAR LOGS ─── */
+    /* ─── CLEAR LOGS (Permanently delete Activity Logs) ─── */
     public function clearLogs()
     {
         try {
-            // Gumamit ng delete() imbes na truncate() para iwas error sa cloud
+            // Ito ang magbubura sa database sa Aiven
             \App\Models\ActivityLog::query()->delete(); 
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /* ─── EMPTY BIN (Permanently delete all Operations in Trash) ─── */
+    public function emptyBin()
+    {
+        try {
+            // Ito ang magbubura sa database operations table na naka-soft delete
+            \App\Models\Operation::onlyTrashed()->forceDelete();
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);

@@ -1441,6 +1441,24 @@ function renderBin(){
   }).join('');
 }
 
+async function confirmEmptyBin() {
+    // I-double check na ito ang tamang pangalan na tinatawag ng button mo
+    const res = await fetch('/operations/trash/empty', {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json'
+        }
+    });
+
+    if (res.ok) {
+        toast('Database: Recycle Bin emptied ✓');
+        location.reload(); // I-reload para malinis ang table at mawala sila sa screen
+    } else {
+        toast('Failed to empty Recycle Bin.');
+    }
+}
+
 function restoreRow(ti){
   const card=document.getElementById('bin-card-'+ti);
   if(card) card.style.animation='cardIn .3s ease reverse forwards';
