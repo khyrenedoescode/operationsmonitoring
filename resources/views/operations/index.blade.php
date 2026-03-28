@@ -671,7 +671,7 @@ tbody tr:hover .edit-hint{opacity:1;}
     <div class="form-grid">
       <div class="form-group full"><label>Client Name</label><input type="text" id="f-client" placeholder="e.g. Acme Corp" /></div>
       <div class="form-group"><label>Proposal Stage</label>
-        <select id="f-stage"><option>Homepage</option><option>Sitemap</option><option>All Pages</option><option>Final Homepage</option></select>
+        <select id="f-stage"><option>Sitemap</option><option>Homepage</option><option>All Pages</option><option>Final Homepage</option></select>
       </div>
       <div class="form-group"><label>Proposal Assigned</label><input type="text" id="f-prop-assign" placeholder="Name..." /></div>
       <div class="form-group"><label>UI/UX Status</label>
@@ -732,10 +732,10 @@ tbody tr:hover .edit-hint{opacity:1;}
   <div class="confirm-box">
     <span class="bin-icon">🪣</span>
     <h3>Empty Recycle Bin?</h3>
-    <p>All items in the Recycle Bin will be permanently deleted.<br>This action cannot be undone.</p>
+    <p>This will permanently delete all items.<br>This action cannot be undone.</p>
     <div class="confirm-actions">
       <button class="btn-confirm-cancel" onclick="closeEmptyBinConfirm()">Cancel</button>
-      <button class="btn-confirm-delete" onclick="confirmEmptyBin()">Empty Now</button>
+      <button class="btn-confirm-delete" onclick="confirmEmptyBin()">Empty Bin</button>
     </div>
   </div>
 </div>
@@ -752,7 +752,7 @@ tbody tr:hover .edit-hint{opacity:1;}
 /* ════════════════════════════════════════════════
    CONFIG
 ════════════════════════════════════════════════ */
-const STAGES    = ['Homepage','Sitemap','All Pages','Final Homepage'];
+const STAGES    = ['Sitemap','Homepage','All Pages','Final Homepage'];
 const AV_COLORS = ['av1','av2','av3','av4'];
 const CSRF      = document.querySelector('meta[name="csrf-token"]').content;
 const ROUTES    = {
@@ -1379,7 +1379,9 @@ function confirmDelete(){
 }
 document.getElementById('confirm-modal').addEventListener('click',e=>{if(e.target===e.currentTarget) closeConfirm();});
 document.getElementById('confirm-clear-logs-modal').addEventListener('click',e=>{if(e.target===e.currentTarget) closeClearLogsConfirm();});
-document.getElementById('confirm-empty-bin-modal').addEventListener('click',e=>{if(e.target===e.currentTarget) closeEmptyBinConfirm();});
+document.getElementById('confirm-empty-bin-modal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeEmptyBinConfirm();
+});
 
 /* ════════════════════════════════════════════════
    RECYCLE BIN
@@ -1505,15 +1507,40 @@ function deletePermanently(ti){
   },250);
 }
 
-function emptyBin(){
-  if(trash.length===0) return;
-  document.getElementById('confirm-empty-bin-modal').classList.add('open');
+// 1. Bubuksan ang warning modal kapag pinindot ang Empty Bin button
+function emptyBin() {
+    if (trash.length === 0) return; // Wag bubukas kung walang laman
+    document.getElementById('confirm-empty-bin-modal').classList.add('open');
 }
-function closeEmptyBinConfirm(){ document.getElementById('confirm-empty-bin-modal').classList.remove('open'); }
-function confirmEmptyBin(){
-  closeEmptyBinConfirm();
-  logActivity('delete', `Emptied Recycle Bin`, `${trash.length} records removed`);
-  trash=[];renderBin();updateBinBadge();toast('Recycle Bin emptied 🗑');
+
+// 2. Isasara ang modal kapag kinancel
+function closeEmptyBinConfirm() {
+    document.getElementById('confirm-empty-bin-modal').classList.remove('open');
+}
+
+// 3. Ito na yung magbubura sa database kapag kinonfirm mo!
+async function confirmEmptyBin() {
+    closeEmptyBinConfirm(); // Isara ang modal
+    
+    try {
+        const res = await fetch('/operations/trash/empty', {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            }
+        });
+
+        if (res.ok) {
+            toast('Database: Recycle Bin emptied ✓');
+            location.reload(); // Mag-rerefresh para malinis ang screen
+        } else {
+            toast('Failed to empty Recycle Bin.');
+        }
+    } catch (err) {
+        console.error('Error:', err);
+        toast('Connection error.');
+    }
 }
 
 /* ════════════════════════════════════════════════
