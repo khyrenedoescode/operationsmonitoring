@@ -1568,7 +1568,7 @@ async function confirmEmptyBin() {
                 renderBin();
                 activityLog.unshift({type:'delete', message:'Recycle Bin emptied', ts: Date.now()});
                 updateLogBadge();
-                toast('Recycle Bin emptied ✓');
+                toast('Recycle Bin cleared');
             }, cards.length * 60 + 320);
 
         } else {
