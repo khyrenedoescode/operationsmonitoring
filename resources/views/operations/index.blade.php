@@ -1538,10 +1538,9 @@ function closeEmptyBinConfirm() {
     document.getElementById('confirm-empty-bin-modal').classList.remove('open');
 }
 
-// 3. Ito na yung magbubura sa database kapag kinonfirm mo!
 async function confirmEmptyBin() {
-    closeEmptyBinConfirm(); // Isara ang modal
-    
+    closeEmptyBinConfirm();
+
     try {
         const res = await fetch('/operations/trash/empty', {
             method: 'DELETE',
@@ -1552,8 +1551,26 @@ async function confirmEmptyBin() {
         });
 
         if (res.ok) {
-            toast('Recycle Bin emptied ✓');
-            location.reload(); // Mag-rerefresh para malinis ang screen
+            // Animate all bin cards out first
+            const cards = document.querySelectorAll('.bin-card');
+            cards.forEach((card, i) => {
+                setTimeout(() => {
+                    card.style.transition = 'opacity .3s ease, transform .3s ease';
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateX(20px)';
+                }, i * 60);
+            });
+
+            // Then clear the data and re-render after animation
+            setTimeout(() => {
+                trash = [];
+                updateBinBadge();
+                renderBin();
+                activityLog.unshift({type:'delete', message:'Recycle Bin emptied', ts: Date.now()});
+                updateLogBadge();
+                toast('Recycle Bin emptied ✓');
+            }, cards.length * 60 + 320);
+
         } else {
             toast('Failed to empty Recycle Bin.');
         }
