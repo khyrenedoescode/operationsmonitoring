@@ -925,19 +925,33 @@ async function clearLog(){
   if(!activityLog.length) return;
   document.getElementById('confirm-clear-logs-modal').classList.add('open');
 }
-function closeClearLogsConfirm(){ document.getElementById('confirm-clear-logs-modal').classList.remove('open'); }
+
+function closeClearLogsConfirm(){ 
+  document.getElementById('confirm-clear-logs-modal').classList.remove('open'); 
+}
+
 async function confirmClearLogs(){
   closeClearLogsConfirm();
-  const res = await fetch(ROUTES.clearLogs, {
+  
+  // Mas safe gamitin ang direct string path '/activity-logs/clear'
+  const res = await fetch('/activity-logs/clear', {
     method: 'DELETE',
-    headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' }
+    headers: { 
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'), 
+      'Accept': 'application/json' 
+    }
   });
   
-  if(res.ok){
+  const data = await res.json();
+  
+  if(res.ok && data.success){
     activityLog = [];
     updateLogBadge();
     renderLog();
     toast('Activity log cleared');
+  } else {
+    toast('Failed to clear logs');
+    console.error(data);
   }
 }
 

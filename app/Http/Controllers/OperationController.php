@@ -39,7 +39,6 @@ class OperationController extends Controller
             'uiux_assign' => 'nullable|string',
             'uiux_status' => 'nullable|string',
             'dev_assign' => 'nullable|string|max:100',
-            // Accept empty string OR one of the valid values
             'dev_fe' => 'nullable|string|in:,Done,In Progress,Pending',
             'dev_be' => 'nullable|string|in:,Done,In Progress,Pending',
             'fe' => 'nullable|integer|min:0|max:100',
@@ -49,7 +48,6 @@ class OperationController extends Controller
             'final_remark' => 'nullable|string',
         ]);
 
-        // ── Normalise values ──
         $data['prop_assign'] = !empty($data['prop_assign']) ? $data['prop_assign'] : '—';
         $data['dev_assign'] = !empty($data['dev_assign']) ? $data['dev_assign'] : '—';
         $data['fe'] = $data['fe'] ?? 0;
@@ -59,10 +57,7 @@ class OperationController extends Controller
         $data['last_edited_by'] = $request->input('edited_by', 'System');
         $data['last_edited_field'] = 'created';
 
-        // ── We need to insert a temporary unique tag first, then update it ──
-        // Reason: we need the auto-incremented ID to generate the real tag,
-        // but `tag` has a unique constraint so we can't leave it null/empty.
-        $data['tag'] = 'TEMP-' . uniqid();  // placeholder to satisfy unique constraint
+        $data['tag'] = 'TEMP-' . uniqid(); 
 
         $op = Operation::create($data);
         $op->tag = Operation::generateTag($op->client, $op->id);
@@ -75,7 +70,6 @@ class OperationController extends Controller
             'user' => $data['last_edited_by'],
         ]);
 
-        // Format due date back to plain string for JSON response
         $responseRow = $op->toArray();
         $responseRow['due'] = $op->due ? $op->due->format('Y-m-d') : null;
 
@@ -90,19 +84,9 @@ class OperationController extends Controller
     public function update(Request $request, Operation $operation)
     {
         $allowed = [
-            'client',
-            'tag',
-            'stage',
-            'prop_assign',
-            'prop_remark',
-            'dev_assign',
-            'dev_fe',
-            'dev_be',
-            'fe',
-            'be',
-            'status',
-            'due',
-            'final_remark',
+            'client', 'tag', 'stage', 'prop_assign', 'prop_remark',
+            'dev_assign', 'dev_fe', 'dev_be', 'fe', 'be',
+            'status', 'due', 'final_remark',
         ];
 
         $field = $request->input('field');
@@ -144,7 +128,7 @@ class OperationController extends Controller
         ]);
     }
 
-    /* ─── DESTROY (Move to Recycle Bin) ─── */
+    /* ─── DESTROY ─── */
     public function destroy(Operation $operation)
     {
         $clientName = $operation->client;
@@ -200,7 +184,12 @@ class OperationController extends Controller
     /* ─── CLEAR LOGS ─── */
     public function clearLogs()
     {
-        ActivityLog::truncate();
-        return response()->json(['success' => true]);
+        try {
+            // Gumamit ng delete() imbes na truncate() para iwas error sa cloud
+            \App\Models\ActivityLog::query()->delete(); 
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 }
