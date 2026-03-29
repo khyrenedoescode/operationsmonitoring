@@ -179,7 +179,6 @@ thead tr:last-child th{background:var(--surface3);padding:10px 14px;font-family:
 .sd-dev{background:var(--accent3);}
 .sd-status{background:var(--onhold);}
 
-/* FIXED: Delete header cell — shows icon + DELETE label like Image 1 */
 .delete-th{text-align:center;width:64px;padding:10px 8px !important;border-right:1px solid var(--border) !important;}
 .delete-th-inner{display:flex;flex-direction:column;align-items:center;gap:4px;}
 .delete-th-inner svg{width:13px;height:13px;color:var(--muted);opacity:.7;}
@@ -428,32 +427,6 @@ tbody tr:hover .edit-hint{opacity:1;}
 .loading-spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
 .loading-box p{font-size:.82rem;color:var(--muted);}
 
-/* ══ OVERDUE NOTIFICATION POPUP ══ */
-.overdue-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9997;display:flex;align-items:center;justify-content:center;animation:fadeIn .35s ease;}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.overdue-popup{position:relative;z-index:9998;background:var(--glass);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1.5px solid rgba(201,96,112,.35);border-radius:24px;padding:40px 44px;width:min(480px,92vw);box-shadow:0 24px 64px rgba(201,96,112,.25),0 0 0 1px rgba(255,255,255,.08);animation:modalIn .4s cubic-bezier(.22,1,.36,1);font-family:'Poppins',sans-serif;}
-.overdue-popup-header{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
-.overdue-popup-icon{font-size:2rem;animation:wobble .6s ease;flex-shrink:0;}
-.overdue-popup-title{font-size:1.15rem;font-weight:800;color:var(--revision);letter-spacing:-.3px;}
-.overdue-popup-subtitle{font-size:.72rem;color:var(--muted);margin-top:2px;}
-.overdue-divider{height:1px;background:var(--border);margin:16px 0;}
-.overdue-popup-body{font-size:.78rem;color:var(--muted);line-height:1.6;margin-bottom:20px;}
-.overdue-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:14px;max-height:220px;overflow-y:auto;}
-.overdue-list::-webkit-scrollbar{width:5px;}
-.overdue-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
-.overdue-list li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;background:rgba(201,96,112,.06);border:1px solid rgba(201,96,112,.18);border-radius:10px;font-size:.78rem;color:var(--text);font-weight:500;}
-.overdue-list li .ol-name{display:flex;align-items:center;gap:8px;}
-.overdue-list li .ol-name::before{content:'⚠';font-size:.7rem;color:var(--revision);flex-shrink:0;}
-.overdue-list li .ol-days{font-size:.68rem;font-weight:700;color:var(--revision);background:rgba(201,96,112,.12);border-radius:6px;padding:2px 8px;white-space:nowrap;flex-shrink:0;}
-.overdue-more{font-size:.7rem;color:var(--muted);text-align:center;padding:4px 0 8px;}
-.overdue-popup-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:8px;}
-.overdue-popup-dismiss{padding:10px 22px;border-radius:10px;border:1.5px solid var(--border);background:transparent;color:var(--muted2);font-family:'Poppins',sans-serif;font-size:.8rem;font-weight:500;cursor:pointer;transition:all .2s;}
-.overdue-popup-dismiss:hover{background:var(--surface2);color:var(--text);}
-.overdue-popup-view{padding:10px 22px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--revision),#a03050);color:#fff;font-family:'Poppins',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(201,96,112,.35);}
-.overdue-popup-view:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(201,96,112,.45);}
-.row-overdue-highlight{animation:overdueGlow 1.5s ease 3;}
-@keyframes overdueGlow{0%,100%{box-shadow:inset 0 0 0 2px transparent;}50%{box-shadow:inset 0 0 0 2px var(--revision);background:rgba(201,96,112,.08);}}
-
 </style>
 </head>
 <body>
@@ -582,7 +555,6 @@ tbody tr:hover .edit-hint{opacity:1;}
       </colgroup>
       <thead>
         <tr>
-          <!-- FIX: Delete column header background matched to adjacent boxes -->
           <th style="background:var(--surface2);border-bottom:1px solid var(--border);border-right:1px solid var(--border);">
             <div class="delete-th-inner">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -598,7 +570,6 @@ tbody tr:hover .edit-hint{opacity:1;}
           <th colspan="1" class="group-final col-sep" style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);">⊞ Final</th>
         </tr>
         <tr>
-          <!-- FIX: Empty cell under the delete header — matches design -->
           <th class="delete-th" style="background:var(--surface3);border-bottom:2px solid var(--border);"></th>
 
           <!-- Sortable: Client Name -->
@@ -620,7 +591,6 @@ tbody tr:hover .edit-hint{opacity:1;}
           </th>
           <th>Progress</th>
 
-          <!-- Status Header (Sorting Removed) -->
           <th>
             <div class="subhead"><span class="subhead-dot sd-status"></span>Status</div>
           </th>
@@ -971,8 +941,6 @@ function closeClearLogsConfirm(){
 
 async function confirmClearLogs(){
   closeClearLogsConfirm();
-  
-  // Mas safe gamitin ang direct string path '/activity-logs/clear'
   const res = await fetch('/activity-logs/clear', {
     method: 'DELETE',
     headers: { 
@@ -980,9 +948,7 @@ async function confirmClearLogs(){
       'Accept': 'application/json' 
     }
   });
-  
   const data = await res.json();
-  
   if(res.ok && data.success){
     activityLog = [];
     updateLogBadge();
@@ -1004,7 +970,6 @@ function sortTable(key){
     sortKey = key;
     sortDir = 'asc';
   }
-  // Update sort indicators
   document.querySelectorAll('.sort-indicator').forEach(el => {
     el.classList.remove('asc','desc');
   });
@@ -1090,7 +1055,6 @@ async function exportPDF(){
     return !tr || tr.style.display !== 'none';
   });
 
-  // ── Title & meta
   doc.setFont('helvetica','bold');
   doc.setFontSize(16);
   doc.setTextColor(201, 99, 122);
@@ -1101,7 +1065,6 @@ async function exportPDF(){
   doc.setTextColor(160, 128, 112);
   doc.text(`Exported ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})} · ${visible.length} record${visible.length!==1?'s':''}`, 14, 22);
 
-  // ── Table
   const head = [['Client','Stage','Proposal','UI/UX Assigned','UI/UX Status','Dev Assigned','FE%','BE%','Status','Due Date']];
   const body = visible.map(r => [
     r.client + (r.tag ? `\n${r.tag}` : ''),
@@ -1154,7 +1117,6 @@ async function exportPDF(){
     },
     alternateRowStyles: { fillColor: [253, 246, 240] },
     didDrawCell(data) {
-      // Color the Status column cells
       if(data.section === 'body' && data.column.index === 8) {
         const val = data.cell.raw;
         const [r,g,b] = statusColor(val);
@@ -1375,7 +1337,7 @@ async function ajaxPatch(idx,field,value){
 
 function save(i,key,el){
   const val=el.innerText.trim();
-  if(rows[i][key]===val) return; // No change, skip
+  if(rows[i][key]===val) return;
   const oldVal = rows[i][key];
   rows[i][key]=val;
   ajaxPatch(i,key,val);
@@ -1394,7 +1356,7 @@ function saveVal(i,key,val){
 }
 function savePct(i,key,el){
   const v=Math.min(100,Math.max(0,parseInt(el.innerText.replace('%',''))||0));
-  if(rows[i][key]===v) return; // No change, skip
+  if(rows[i][key]===v) return;
   rows[i][key]=v;el.innerText=v+'%';
   const bar=document.getElementById('p'+key+'-'+i);
   if(bar){bar.style.transition='width .6s cubic-bezier(.34,1.56,.64,1)';bar.style.width=v+'%';}
@@ -1456,7 +1418,6 @@ function confirmDelete(){
       rows.splice(i,1);
       renderTable();
       updateBinBadge();
-      // Add to log immediately for UI feedback
       activityLog.unshift({type:'delete', message: `${clientName} moved to Recycle Bin`, ts: Date.now()});
       updateLogBadge();
       toast('Moved to Recycle Bin 🗑');
@@ -1468,7 +1429,6 @@ document.getElementById('confirm-clear-logs-modal').addEventListener('click',e=>
 document.getElementById('confirm-empty-bin-modal').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeEmptyBinConfirm();
 });
-
 document.getElementById('confirm-perm-delete-modal').addEventListener('click', e => {
   if(e.target === e.currentTarget) closePermDeleteConfirm();
 });
@@ -1482,12 +1442,10 @@ let pendingPermDeleteIdx = null;
 function updateBinBadge(){
   const badge=document.getElementById('bin-badge');
   const count = trash.length;
-  // If count is less than last seen (items restored/deleted), sync last seen
   if(count < binLastSeenCount){
     binLastSeenCount = count;
     localStorage.setItem('binLastSeenCount', binLastSeenCount);
   }
-  
   if(count > binLastSeenCount){
     badge.textContent = count - binLastSeenCount;
     badge.classList.remove('hidden');
@@ -1590,20 +1548,17 @@ async function confirmPermDelete(){
   }, 280);
 }
 
-// 1. Bubuksan ang warning modal kapag pinindot ang Empty Bin button
 function emptyBin() {
-    if (trash.length === 0) return; // Wag bubukas kung walang laman
+    if (trash.length === 0) return;
     document.getElementById('confirm-empty-bin-modal').classList.add('open');
 }
 
-// 2. Isasara ang modal kapag kinancel
 function closeEmptyBinConfirm() {
     document.getElementById('confirm-empty-bin-modal').classList.remove('open');
 }
 
 async function confirmEmptyBin() {
     closeEmptyBinConfirm();
-
     try {
         const res = await fetch('/operations/trash/empty', {
             method: 'DELETE',
@@ -1612,9 +1567,7 @@ async function confirmEmptyBin() {
                 'Accept': 'application/json'
             }
         });
-
         if (res.ok) {
-            // Animate all bin cards out first
             const cards = document.querySelectorAll('.bin-card');
             cards.forEach((card, i) => {
                 setTimeout(() => {
@@ -1623,8 +1576,6 @@ async function confirmEmptyBin() {
                     card.style.transform = 'translateX(20px)';
                 }, i * 60);
             });
-
-            // Then clear the data and re-render after animation
             setTimeout(() => {
                 trash = [];
                 updateBinBadge();
@@ -1633,7 +1584,6 @@ async function confirmEmptyBin() {
                 updateLogBadge();
                 toast('Recycle Bin cleared');
             }, cards.length * 60 + 320);
-
         } else {
             toast('Failed to empty Recycle Bin.');
         }
@@ -1646,23 +1596,18 @@ async function confirmEmptyBin() {
 /* ════════════════════════════════════════════════
    ADD MODAL & ADD ROW LOGIC
 ════════════════════════════════════════════════ */
-
-// Opens the Add Client Modal
 function openModal() {
     document.getElementById('modal').classList.add('open');
 }
 
-// Closes the Add Client Modal
 function closeModal() {
     document.getElementById('modal').classList.remove('open');
 }
 
-// THE MAIN SAVE FUNCTION
 async function addRow() {
     const clientEl = document.getElementById('f-client');
     const client = clientEl.value.trim();
 
-    // Validation: Don't allow empty client names
     if (!client) {
         clientEl.style.borderColor = 'var(--revision)';
         clientEl.focus();
@@ -1670,7 +1615,6 @@ async function addRow() {
     }
     clientEl.style.borderColor = '';
 
-    // 1. Prepare the data to match your Laravel Controller
     const payload = {
         client: client,
         stage: document.getElementById('f-stage').value,
@@ -1690,7 +1634,6 @@ async function addRow() {
     };
 
     try {
-        // 2. FETCH CALL: Using absolute path '/operations' for Render compatibility
         const res = await fetch('/operations', {
             method: 'POST',
             headers: {
@@ -1706,7 +1649,6 @@ async function addRow() {
         if (res.ok && data.success) {
             const r = data.row;
 
-            // 3. Update the local "rows" array so the table updates instantly
             rows.push({
                 id: r.id,
                 client: r.client,
@@ -1729,14 +1671,12 @@ async function addRow() {
                 updated_at: 'just now'
             });
 
-            // 4. UI Cleanup
             closeModal();
             ['f-client', 'f-prop-assign', 'f-uiux-assign', 'f-dev-assign', 'f-fe', 'f-be', 'f-due', 'f-prop-remark', 'f-final-remark'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = '';
             });
 
-            // 5. Re-draw the table and show animations
             renderTable();
             
             setTimeout(() => {
@@ -1747,7 +1687,6 @@ async function addRow() {
                 }
             }, 120);
 
-            // 6. Update Activity Log and Toast
             if (typeof activityLog !== 'undefined') {
                 activityLog.unshift({
                     type: 'add',
@@ -1761,7 +1700,6 @@ async function addRow() {
             toast('Client added ✓');
 
         } else {
-            // Error handling for validation (e.g., missing fields)
             toast('Error saving — check console');
             console.error('Server returned error:', data);
             if (data.errors) {
@@ -1775,7 +1713,6 @@ async function addRow() {
     }
 }
 
-// Close modal when clicking outside of it (the gray background)
 document.getElementById('modal').addEventListener('click', e => {
     if (e.target === e.currentTarget) closeModal();
 });
@@ -1798,94 +1735,9 @@ let toastTimer;
 function toast(msg){document.querySelector('.toast')?.remove();clearTimeout(toastTimer);const el=Object.assign(document.createElement('div'),{className:'toast',textContent:msg});document.body.appendChild(el);toastTimer=setTimeout(()=>el.remove(),2400);}
 
 /* ════════════════════════════════════════════════
-   OVERDUE POPUP ON LOAD
-════════════════════════════════════════════════ */
-function checkOverdueOnLoad(){
-  const today = new Date();
-  today.setHours(0,0,0,0);
-
-  const overdue = rows.filter(r => {
-    if(!r.due) return false;
-    return new Date(r.due + 'T00:00:00') < today;
-  });
-
-  if(overdue.length === 0) return;
-
-  const overlay = document.createElement('div');
-  overlay.className = 'overdue-overlay';
-  overlay.id = 'overdue-overlay';
-
-  const listItems = overdue.slice(0, 6).map(r => {
-    const due = new Date(r.due + 'T00:00:00');
-    const daysOver = Math.floor((today - due) / (1000*60*60*24));
-    return `<li>
-      <span class="ol-name">${escHtml(r.client)}</span>
-      <span class="ol-days">${daysOver} day${daysOver !== 1 ? 's' : ''} overdue</span>
-    </li>`;
-  }).join('');
-
-  const moreText = overdue.length > 6
-    ? `<div class="overdue-more">+${overdue.length - 6} more overdue project${overdue.length - 6 !== 1 ? 's' : ''}</div>`
-    : '';
-
-  overlay.innerHTML = `
-    <div class="overdue-popup">
-      <div class="overdue-popup-header">
-        <span class="overdue-popup-icon">⚠️</span>
-        <div>
-          <div class="overdue-popup-title">${overdue.length} Overdue Project${overdue.length > 1 ? 's' : ''}</div>
-          <div class="overdue-popup-subtitle">These projects have passed their due date</div>
-        </div>
-      </div>
-      <div class="overdue-divider"></div>
-      <div class="overdue-popup-body">
-        <ul class="overdue-list">${listItems}</ul>
-        ${moreText}
-        Please review and update the project statuses.
-      </div>
-      <div class="overdue-popup-actions">
-        <button class="overdue-popup-dismiss" onclick="dismissOverduePopup()">Dismiss</button>
-        <button class="overdue-popup-view" onclick="viewOverdueProjects()">View Projects</button>
-      </div>
-    </div>
-  `;
-
-  document.body.appendChild(overlay);
-}
-
-function dismissOverduePopup(){
-  const overlay = document.getElementById('overdue-overlay');
-  if(overlay){
-    overlay.style.transition = 'opacity .3s ease';
-    overlay.style.opacity = '0';
-    setTimeout(() => overlay.remove(), 300);
-  }
-}
-
-function viewOverdueProjects(){
-  dismissOverduePopup();
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  document.querySelector('.table-wrap')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  setTimeout(() => {
-    rows.forEach((r, i) => {
-      if(!r.due) return;
-      if(new Date(r.due + 'T00:00:00') < today){
-        const tr = document.getElementById('row-' + i);
-        if(tr){
-          tr.classList.add('row-overdue-highlight');
-          tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          setTimeout(() => tr.classList.remove('row-overdue-highlight'), 4500);
-        }
-      }
-    });
-  }, 400);
-}
-/* ════════════════════════════════════════════════
    INIT
 ════════════════════════════════════════════════ */
 renderTable();
-setTimeout(checkOverdueOnLoad, 800); // slight delay so table renders first
 </script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
