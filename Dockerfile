@@ -27,4 +27,8 @@ RUN sed -i 's/80/10000/g' /etc/apache2/ports.conf /etc/apache2/sites-available/0
 EXPOSE 10000
 
 # FIX 2: Clear old cached settings right before Apache starts
-CMD php artisan optimize:clear && apache2-foreground
+CMD php artisan optimize:clear && \
+    php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan migrate --force && \
+    apache2-foreground
