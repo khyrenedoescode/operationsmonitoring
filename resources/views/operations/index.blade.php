@@ -2013,21 +2013,96 @@ function viewOverdueProjects(){
   dismissOverduePopup();
   const today = new Date();
   today.setHours(0,0,0,0);
+
+  // Collect overdue row indices
+  const overdueIndices = [];
+  rows.forEach((r, i) => {
+    const isOverdue = (
+      (r.due      && new Date(r.due      + 'T00:00:00') < today) ||
+      (r.uiux_due && new Date(r.uiux_due + 'T00:00:00') < today) ||
+      (r.dev_due  && new Date(r.dev_due  + 'T00:00:00') < today)
+    );
+    if(isOverdue) overdueIndices.push(i);
+  });
+
+  if(overdueIndices.length === 0) return;
+
+  // Hide non-overdue rows
+  rows.forEach((_, i) => {
+    const tr = document.getElementById('row-' + i);
+    if(!tr) return;
+    if(overdueIndices.includes(i)){
+      tr.style.display = '';
+      tr.classList.add('row-overdue-highlight');
+      setTimeout(() => tr.classList.remove('row-overdue-highlight'), 4500);
+    } else {
+      tr.style.display = 'none';
+    }
+  });
+
+  // Update footer
+  document.getElementById('footer-count').textContent =
+    `Showing ${overdueIndices.length} overdue client${overdueIndices.length !== 1 ? 's' : ''}`;
+
+  // Show the unfilter button
+  showOverdueFilterBar(overdueIndices.length);
+
   document.querySelector('.table-wrap')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  setTimeout(() => {
-    rows.forEach((r, i) => {
-      if(!r.due) return;
-      if(new Date(r.due + 'T00:00:00') < today){
-        const tr = document.getElementById('row-' + i);
-        if(tr){
-          tr.classList.add('row-overdue-highlight');
-          tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          setTimeout(() => tr.classList.remove('row-overdue-highlight'), 4500);
-        }
-      }
-    });
-  }, 400);
 }
+
+function showOverdueFilterBar(count){
+  // Remove existing bar if any
+  document.getElementById('overdue-filter-bar')?.remove();
+
+  const bar = document.createElement('div');
+  bar.id = 'overdue-filter-bar';
+  bar.style.cssText = `
+    display:flex;align-items:center;gap:10px;
+    margin-bottom:14px;padding:10px 16px;
+    background:rgba(201,96,112,.08);
+    border:1.5px solid rgba(201,96,112,.3);
+    border-radius:12px;
+    font-family:'Poppins',sans-serif;
+    animation:fadeUp .3s ease;
+  `;
+  bar.innerHTML = `
+    <span style="font-size:.8rem;color:var(--revision);font-weight:600;">
+      ⚠️ Showing ${count} overdue client${count !== 1 ? 's' : ''}
+    </span>
+    <button onclick="clearOverdueFilter()" style="
+      margin-left:auto;padding:6px 14px;border-radius:8px;
+      border:1.5px solid rgba(201,96,112,.4);
+      background:transparent;color:var(--revision);
+      font-family:'Poppins',sans-serif;font-size:.75rem;font-weight:600;
+      cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;
+    " onmouseover="this.style.background='rgba(201,96,112,.12)'"
+       onmouseout="this.style.background='transparent'">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+      Show All
+    </button>
+  `;
+
+  // Insert the bar before the table
+  const tableWrap = document.querySelector('.table-wrap');
+  tableWrap.parentNode.insertBefore(bar, tableWrap);
+}
+
+function clearOverdueFilter(){
+  // Show all rows
+  rows.forEach((_, i) => {
+    const tr = document.getElementById('row-' + i);
+    if(tr) tr.style.display = '';
+  });
+
+  // Remove the filter bar
+  document.getElementById('overdue-filter-bar')?.remove();
+
+  // Restore footer count
+  applyFilters();
+}
+
 /* ════════════════════════════════════════════════
    INIT
 ════════════════════════════════════════════════ */
