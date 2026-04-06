@@ -242,6 +242,9 @@ tbody tr:hover .edit-hint{opacity:1;}
 
 .dev-select-minimal{font-size:.62rem;background:var(--surface3);border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:2px 6px;outline:none;cursor:pointer;transition:all .2s;font-family:'Poppins',sans-serif;flex:1;}
 .dev-select-minimal:hover{border-color:var(--accent);color:var(--text);}
+.dev-due-section{display:flex;flex-direction:column;gap:4px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border);}
+.dev-due-row{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;white-space:nowrap;}
+.dev-due-label{font-size:.6rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;min-width:48px;}
 
 .progress-wrap{display:flex;flex-direction:column;gap:8px;}
 .progress-row{display:flex;flex-direction:column;gap:3px;}
@@ -277,7 +280,7 @@ tbody tr:hover .edit-hint{opacity:1;}
 .due-date svg{width:13px;height:13px;}
 .due-overdue{color:var(--revision) !important;background:rgba(201,96,112,.1) !important;}
 
-.due-notification{font-size:.68rem;font-weight:600;padding:5px 9px;border-radius:7px;margin-top:6px;display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(201,96,112,.15),rgba(201,96,112,.08));border:1px solid rgba(201,96,112,.3);color:var(--revision);}
+.due-notification{font-size:.68rem;font-weight:600;padding:5px 9px;border-radius:7px;margin-top:6px;display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(201,96,112,.15),rgba(201,96,112,.08));border:1px solid rgba(201,96,112,.3);color:var(--revision);white-space:nowrap;width:fit-content;}
 .due-notification svg{width:12px;height:12px;flex-shrink:0;}
 .due-notification.warning{background:linear-gradient(135deg,rgba(176,128,32,.15),rgba(176,128,32,.08));border-color:rgba(176,128,32,.3);color:var(--onhold);}
 .due-notification.safe{background:linear-gradient(135deg,rgba(90,154,106,.15),rgba(90,154,106,.08));border-color:rgba(90,154,106,.3);color:var(--done);}
@@ -291,6 +294,7 @@ tbody tr:hover .edit-hint{opacity:1;}
 .final-text:empty:before{content:attr(data-placeholder);color:var(--muted);opacity:.45;pointer-events:none;font-style:italic;}
 .remark-text{font-size:.77rem;color:var(--muted);margin-top:6px;line-height:1.5;min-height:22px;white-space:pre-wrap;word-break:break-word;max-height:200px;overflow-y:auto;text-align:justify;}
 .remark-text:empty:before{content:attr(data-placeholder);color:var(--muted);opacity:.45;pointer-events:none;font-style:italic;}
+
 
 /* ══════════════════════════════════════════════
    FOOTER
@@ -456,6 +460,46 @@ tbody tr:hover .edit-hint{opacity:1;}
 .row-overdue-highlight{animation:overdueGlow 1.5s ease 3;}
 @keyframes overdueGlow{0%,100%{box-shadow:inset 0 0 0 2px transparent;}50%{box-shadow:inset 0 0 0 2px var(--revision);background:rgba(201,96,112,.08);}}
 
+/* ══ OVERDUE EXPANDABLE LIST ══ */
+.od-client-item{
+  flex-direction:column !important;
+  align-items:stretch !important;
+  cursor:pointer;
+  padding:0 !important;
+  overflow:hidden;
+  border-radius:10px !important;
+}
+.od-client-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;
+  transition:background .2s;
+}
+.od-client-item:hover .od-client-header{background:rgba(201,96,112,.1);}
+.od-count-pill{
+  font-size:.6rem;font-weight:700;
+  background:rgba(201,96,112,.18);color:var(--revision);
+  border-radius:999px;padding:2px 8px;
+}
+.od-chevron{
+  font-size:.7rem;color:var(--muted);
+  transition:transform .25s;display:inline-block;
+}
+.od-client-item.od-open .od-chevron{transform:rotate(180deg);}
+.od-detail-wrap{
+  display:none;
+  flex-direction:column;gap:4px;
+  padding:0 14px 10px;
+  border-top:1px solid rgba(201,96,112,.15);
+}
+.od-client-item.od-open .od-detail-wrap{display:flex;}
+.od-detail-row{
+  display:flex;align-items:center;gap:8px;
+  font-size:.74rem;color:var(--text);
+  padding:5px 0;
+}
+.od-detail-icon{font-size:.8rem;flex-shrink:0;}
+.od-detail-label{flex:1;color:var(--muted2);font-weight:500;}
+
 </style>
 </head>
 <body>
@@ -572,15 +616,15 @@ tbody tr:hover .edit-hint{opacity:1;}
       <colgroup>
         <col style="width:64px">
         <col style="width:145px">
-        <col style="width:155px">
-        <col style="width:265px">
-        <col style="width:155px">
-        <col style="width:155px">
-        <col style="width:155px">
+        <col style="width:150px">
+        <col style="width:220px">
+        <col style="width:150px">
+        <col style="width:160px">
+        <col style="width:175px">
         <col style="width:135px">
-        <col style="width:130px">
-        <col style="width:125px">
-        <col style="width:225px">
+        <col style="width:115px">
+        <col style="width:120px">
+        <col style="width:220px">
       </colgroup>
       <thead>
         <tr>
@@ -595,12 +639,12 @@ tbody tr:hover .edit-hint{opacity:1;}
             </div>
           </th>
           <th style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--border);color:var(--muted2);"></th>
-          <th colspan="4" class="group-proposal col-sep" style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);">📋 Proposal Phase</th>
+          <th colspan="2" class="group-proposal col-sep" style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);">📋 Proposal Phase</th>
+          <th colspan="2" style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);border-left:1px solid var(--border);color:var(--accent);">🎨 UI/UX</th>
           <th colspan="4" class="group-dev col-sep" style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);">⚙ Development Phase</th>
-          <th colspan="1" class="group-final col-sep" style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);">⊞ Final</th>
+          <th colspan="1" class="group-final" style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);border-left:1px solid var(--border);color:var(--onhold);">⊞ Final</th>
         </tr>
         <tr>
-          <!-- FIX: Empty cell under the delete header — matches design -->
           <th class="delete-th" style="background:var(--surface3);border-bottom:2px solid var(--border);"></th>
 
           <!-- Sortable: Client Name -->
@@ -608,30 +652,35 @@ tbody tr:hover .edit-hint{opacity:1;}
             Client Name
             <span class="sort-indicator" id="sort-client"><svg viewBox="0 0 10 6" class="si-up"><path d="M1 5l4-4 4 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg><svg viewBox="0 0 10 6" class="si-down"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span>
           </th>
+
+          <!-- Proposal Phase columns -->
           <th class="col-sep">
             <div class="subhead"><span class="subhead-dot sd-proposal"></span>Proposal Status</div>
           </th>
           <th>Proposal Remarks</th>
-          <th class="col-sep">UI/UX Assigned</th>
-          <th>
-            <div class="subhead"><span class="subhead-dot sd-proposal"></span>Status</div>
+
+          <!-- UI/UX Assigned & Status — NO divider between them, merged feel -->
+          <th class="col-sep" style="border-right:none !important;">
+            UI/UX Assigned
           </th>
-          <th class="col-sep">Dev Assigned</th>
-          <th>
-            <div class="subhead"><span class="subhead-dot sd-dev"></span>Dev Status</div>
+          <th style="border-left:none !important;">
+            <div class="subhead"><span class="subhead-dot sd-proposal"></span>UI/UX Status</div>
+          </th>
+
+          <!-- Dev Phase columns — separator here to divide from Proposal -->
+          <th class="col-sep" style="border-right:none !important;">Dev Assigned</th>
+          <th style="border-left:none !important;">
+            <div class="subhead"><span class="subhead-dot sd-dev"></span>Status</div>
           </th>
           <th>Progress</th>
 
-          <!-- Status Header (Sorting Removed) -->
+          <!-- Overall Status -->
           <th>
-            <div class="subhead"><span class="subhead-dot sd-status"></span>Status</div>
+            <div class="subhead"><span class="subhead-dot sd-status"></span>Dev Status</div>
           </th>
 
-          <!-- Sortable: Due Date -->
-          <th class="col-sep sortable" onclick="sortTable('due')" title="Sort by Due Date">
-            Final Remarks
-            <span class="sort-indicator" id="sort-due"><svg viewBox="0 0 10 6" class="si-up"><path d="M1 5l4-4 4 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg><svg viewBox="0 0 10 6" class="si-down"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></span>
-          </th>
+          <!-- Final Remarks -->
+          <th style="border-left:1px solid var(--border);padding:10px 14px;text-align:left;">Final Remarks</th>
         </tr>
       </thead>
       <tbody id="table-body"></tbody>
@@ -1228,27 +1277,33 @@ function renderRow(r,i,anim=false){
       </div>
       <div class="remark-text editable" contenteditable="true" spellcheck="false" data-placeholder="Add remarks..." onblur="save(${i},'prop_remark',this)">${escHtml(r.prop_remark)}</div>
     </td>
-    <td class="col-sep">
+    <td class="col-sep" style="border-right:none !important;">
       <div class="assignee"><div class="avatar ${avc(r.uiux_assign)}" id="uav-${i}">${ini(r.uiux_assign)}</div>
         <span class="assignee-name editable" contenteditable="true" spellcheck="false" onblur="save(${i},'uiux_assign',this);rerenderAv('u',${i})" data-placeholder="Name...">${escHtml(r.uiux_assign==='—'?'':r.uiux_assign)}</span>
       </div>
     </td>
-    <td>
-  ${uiuxBadgeHtml(r.uiux_status, i)}
-  <div style="margin-top:8px;">
-    <div class="final-header-row" style="margin-bottom:4px;">
-      <span class="final-date-str" id="uiux-due-str-${i}" style="font-size:.7rem;color:var(--muted2);">${r.uiux_due ? finalDateFmt(r.uiux_due) : ''}</span>
-      <span style="position:relative;display:inline-flex;align-items:center;">
-        <button class="cal-icon-btn" onclick="triggerDueById('uiux-due-input-${i}')" title="Pick UI/UX due date">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-        </button>
-        <input class="due-input" type="date" id="uiux-due-input-${i}" value="${r.uiux_due||''}"
-          onchange="saveVal(${i},'uiux_due',this.value);rerenderUiuxDue(${i},this.value)" />
-      </span>
-    </div>
-    <div id="uiux-due-notif-${i}">${getDueDateNotification(r.uiux_due)}</div>
-  </div>
-  </td>
+    <td style="border-left:none !important;">
+      ${uiuxBadgeHtml(r.uiux_status, i)}
+      <div style="margin-top:16px;padding-top:10px;border-top:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span class="final-date-str" id="uiux-due-str-${i}" style="font-size:.7rem;color:var(--muted2);">${r.uiux_due ? finalDateFmt(r.uiux_due) : ''}</span>
+          <span style="position:relative;display:inline-flex;align-items:center;">
+            <button class="cal-icon-btn" onclick="triggerDueById('uiux-due-input-${i}')" title="Pick UI/UX due date">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            </button>
+            <input class="due-input" type="date" id="uiux-due-input-${i}" value="${r.uiux_due||''}"
+              onchange="saveVal(${i},'uiux_due',this.value);rerenderUiuxDue(${i},this.value)" />
+          </span>
+        </div>
+        <div id="uiux-due-notif-${i}">${getDueDateNotification(r.uiux_due)}</div>
+      </div>
+    </td>
+    <td class="col-sep">
+      <div class="assignee" style="margin-bottom:0;">
+        <div class="avatar ${avc(r.dev_assign)}" id="dav-${i}">${ini(r.dev_assign)}</div>
+        <span class="assignee-name editable" contenteditable="true" spellcheck="false" onblur="save(${i},'dev_assign',this);rerenderAv('d',${i})" data-placeholder="Name...">${escHtml(r.dev_assign==='—'?'':r.dev_assign)}</span>
+      </div>
+    </td>
     <td>
       <div class="dev-pill-group"><div class="dev-group-label">Front-end</div>
         <select class="dev-select-minimal" onchange="saveVal(${i},'dev_fe',this.value)">
@@ -1266,20 +1321,6 @@ function renderRow(r,i,anim=false){
           <option value="Pending"${r.dev_be==='Pending'?' selected':''}>Pending</option>
         </select>
       </div>
-      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px;">
-        <div class="final-header-row" style="margin-bottom:4px;">
-          <span style="font-size:.62rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;">Dev Due</span>
-          <span class="final-date-str" id="dev-due-str-${i}" style="font-size:.7rem;color:var(--muted2);margin-left:6px;">${r.dev_due ? finalDateFmt(r.dev_due) : ''}</span>
-          <span style="position:relative;display:inline-flex;align-items:center;">
-            <button class="cal-icon-btn" onclick="triggerDueById('dev-due-input-${i}')" title="Pick Dev due date">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-            </button>
-            <input class="due-input" type="date" id="dev-due-input-${i}" value="${r.dev_due||''}"
-              onchange="saveVal(${i},'dev_due',this.value);rerenderDevDue(${i},this.value)" />
-          </span>
-        </div>
-        <div id="dev-due-notif-${i}">${getDueDateNotification(r.dev_due)}</div>
-      </div>
     </td>
     <td>
       <div class="progress-wrap">
@@ -1293,22 +1334,39 @@ function renderRow(r,i,anim=false){
         </div>
       </div>
     </td>
-    <td>${badgeHtml(r.status,i)}</td>
-    <td class="col-sep">
-  <div class="final-header-row">
-    <span class="final-tag">Final</span>
-    <span class="final-date-str" id="fdate-str-${i}">${finalDateFmt(r.due)}</span>
-    <span style="position:relative;display:inline-flex;align-items:center;">
-      <button class="cal-icon-btn" onclick="triggerDueById(${i})" title="Pick date">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-      </button>
-      <input class="due-input" type="date" id="due-input-${i}" value="${r.due||''}" onchange="saveVal(${i},'due',this.value);rerenderDue(${i},this.value)" />
-    </span>
+    <td>
+  ${badgeHtml(r.status,i)}
+  <div style="margin-top:16px;padding-top:10px;border-top:1px solid var(--border);">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+      <span class="final-date-str" id="dev-due-str-${i}" style="font-size:.7rem;color:var(--muted2);">${r.dev_due ? finalDateFmt(r.dev_due) : ''}</span>
+      <span style="position:relative;display:inline-flex;align-items:center;">
+        <button class="cal-icon-btn" onclick="triggerDueById('dev-due-input-${i}')" title="Pick Dev due date">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        </button>
+        <input class="due-input" type="date" id="dev-due-input-${i}" value="${r.dev_due||''}"
+          onchange="saveVal(${i},'dev_due',this.value);rerenderDevDue(${i},this.value)" />
+      </span>
+    </div>
+    <div id="dev-due-notif-${i}">${getDueDateNotification(r.dev_due)}</div>
   </div>
-  <div id="due-notif-${i}">${getDueDateNotification(r.due)}</div>
-  <div class="final-text editable" contenteditable="true" spellcheck="false" data-placeholder="Add final remarks..." onblur="save(${i},'final_remark',this)">${escHtml(r.final_remark)}</div>
-</td>
-</tr>`;
+  </td>
+    <td class="col-sep">
+      <div class="final-text editable" contenteditable="true" spellcheck="false" data-placeholder="Add final remarks..." onblur="save(${i},'final_remark',this)">${escHtml(r.final_remark)}</div>
+      <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border);">
+        <div class="final-header-row">
+          <span class="final-tag">Final</span>
+          <span class="final-date-str" id="fdate-str-${i}">${finalDateFmt(r.due)}</span>
+          <span style="position:relative;display:inline-flex;align-items:center;">
+            <button class="cal-icon-btn" onclick="triggerDueById(${i})" title="Pick date">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            </button>
+            <input class="due-input" type="date" id="due-input-${i}" value="${r.due||''}" onchange="saveVal(${i},'due',this.value);rerenderDue(${i},this.value)" />
+          </span>
+        </div>
+        <div id="due-notif-${i}">${getDueDateNotification(r.due)}</div>
+      </div>
+    </td>
+  </tr>`;
 }
 
 /* ════════════════════════════════════════════════
@@ -1861,28 +1919,56 @@ function checkOverdueOnLoad(){
   const today = new Date();
   today.setHours(0,0,0,0);
 
-  const overdue = rows.filter(r => {
-    if(!r.due) return false;
-    return new Date(r.due + 'T00:00:00') < today;
+  const overdueMap = {};
+  rows.forEach(r => {
+    const checks = [
+      { label: 'Final Due',  date: r.due },
+      { label: 'UI/UX Due', date: r.uiux_due },
+      { label: 'Dev Due',   date: r.dev_due },
+    ];
+    checks.forEach(c => {
+      if(!c.date) return;
+      const daysOver = Math.floor((today - new Date(c.date + 'T00:00:00')) / (1000*60*60*24));
+      if(daysOver > 0){
+        if(!overdueMap[r.client]) overdueMap[r.client] = [];
+        overdueMap[r.client].push({ ...c, daysOver });
+      }
+    });
   });
 
-  if(overdue.length === 0) return;
+  const clients = Object.keys(overdueMap);
+  if(clients.length === 0) return;
+
+  const totalCount = Object.values(overdueMap).reduce((sum, arr) => sum + arr.length, 0);
 
   const overlay = document.createElement('div');
   overlay.className = 'overdue-overlay';
   overlay.id = 'overdue-overlay';
 
-  const listItems = overdue.slice(0, 6).map(r => {
-    const due = new Date(r.due + 'T00:00:00');
-    const daysOver = Math.floor((today - due) / (1000*60*60*24));
-    return `<li>
-      <span class="ol-name">${escHtml(r.client)}</span>
-      <span class="ol-days">${daysOver} day${daysOver !== 1 ? 's' : ''} overdue</span>
-    </li>`;
+  const listItems = clients.slice(0, 6).map(client => {
+    const items = overdueMap[client];
+    const itemsHtml = items.map(item => `
+    <div class="od-detail-row">
+      <span class="od-detail-label">${item.label}</span>
+      <span class="ol-days">${item.daysOver} day${item.daysOver !== 1 ? 's' : ''} overdue</span>
+    </div>
+  `).join('');
+
+    return `
+      <li class="od-client-item" onclick="toggleOdDetail(this)">
+        <div class="od-client-header">
+          <span class="ol-name">${escHtml(client)}</span>
+          <span style="display:flex;align-items:center;gap:6px;">
+            <span class="od-count-pill">${items.length} overdue</span>
+            <span class="od-chevron">▾</span>
+          </span>
+        </div>
+        <div class="od-detail-wrap">${itemsHtml}</div>
+      </li>`;
   }).join('');
 
-  const moreText = overdue.length > 6
-    ? `<div class="overdue-more">+${overdue.length - 6} more overdue project${overdue.length - 6 !== 1 ? 's' : ''}</div>`
+  const moreText = clients.length > 6
+    ? `<div class="overdue-more">+${clients.length - 6} more client${clients.length - 6 !== 1 ? 's' : ''} with overdue dates</div>`
     : '';
 
   overlay.innerHTML = `
@@ -1890,8 +1976,8 @@ function checkOverdueOnLoad(){
       <div class="overdue-popup-header">
         <span class="overdue-popup-icon">⚠️</span>
         <div>
-          <div class="overdue-popup-title">${overdue.length} Overdue Project${overdue.length > 1 ? 's' : ''}</div>
-          <div class="overdue-popup-subtitle">These projects have passed their due date</div>
+          <div class="overdue-popup-title">${clients.length} Client${clients.length > 1 ? 's' : ''} with Overdue Dates</div>
+          <div class="overdue-popup-subtitle">${totalCount} overdue deadline${totalCount !== 1 ? 's' : ''} — click a client to see details</div>
         </div>
       </div>
       <div class="overdue-divider"></div>
@@ -1908,6 +1994,10 @@ function checkOverdueOnLoad(){
   `;
 
   document.body.appendChild(overlay);
+}
+
+function toggleOdDetail(el){
+  el.classList.toggle('od-open');
 }
 
 function dismissOverduePopup(){
