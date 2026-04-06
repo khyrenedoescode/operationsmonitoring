@@ -13,6 +13,8 @@ class OperationController extends Controller
     {
         $rows = Operation::orderBy('created_at', 'asc')->get()->map(function ($op) {
             $op->due = $op->due ? $op->due->format('Y-m-d') : null;
+            $op->uiux_due = $op->uiux_due ? $op->uiux_due->format('Y-m-d') : null;  // ← add
+            $op->dev_due = $op->dev_due ? $op->dev_due->format('Y-m-d') : null;  // ← add
             return $op;
         });
 
@@ -44,6 +46,8 @@ class OperationController extends Controller
             'fe' => 'nullable|integer|min:0|max:100',
             'be' => 'nullable|integer|min:0|max:100',
             'status' => 'required|in:Done,On Hold,Revisions',
+            'uiux_due' => 'nullable|date',
+            'dev_due' => 'nullable|date',
             'due' => 'nullable|date',
             'final_remark' => 'nullable|string',
         ]);
@@ -57,7 +61,7 @@ class OperationController extends Controller
         $data['last_edited_by'] = $request->input('edited_by', 'System');
         $data['last_edited_field'] = 'created';
 
-        $data['tag'] = 'TEMP-' . uniqid(); 
+        $data['tag'] = 'TEMP-' . uniqid();
 
         $op = Operation::create($data);
         $op->tag = Operation::generateTag($op->client, $op->id);
@@ -72,6 +76,8 @@ class OperationController extends Controller
 
         $responseRow = $op->toArray();
         $responseRow['due'] = $op->due ? $op->due->format('Y-m-d') : null;
+        $responseRow['uiux_due'] = $op->uiux_due ? $op->uiux_due->format('Y-m-d') : null;
+        $responseRow['dev_due'] = $op->dev_due ? $op->dev_due->format('Y-m-d') : null;
 
         if ($request->expectsJson()) {
             return response()->json(['success' => true, 'row' => $responseRow]);
@@ -84,9 +90,23 @@ class OperationController extends Controller
     public function update(Request $request, Operation $operation)
     {
         $allowed = [
-            'client', 'tag', 'stage', 'prop_assign', 'prop_remark',
-            'dev_assign', 'dev_fe', 'dev_be', 'fe', 'be',
-            'status', 'due', 'final_remark',
+            'client',
+            'tag',
+            'stage',
+            'prop_assign',
+            'prop_remark',
+            'uiux_assign',
+            'uiux_status',
+            'uiux_due',  // ← uiux_due added
+            'dev_assign',
+            'dev_fe',
+            'dev_be',
+            'dev_due',  // ← dev_due added
+            'fe',
+            'be',
+            'status',
+            'due',
+            'final_remark',
         ];
 
         $field = $request->input('field');
@@ -161,6 +181,8 @@ class OperationController extends Controller
 
         $responseRow = $operation->toArray();
         $responseRow['due'] = $operation->due ? $operation->due->format('Y-m-d') : null;
+        $responseRow['uiux_due'] = $operation->uiux_due ? $operation->uiux_due->format('Y-m-d') : null;
+        $responseRow['dev_due'] = $operation->dev_due ? $operation->dev_due->format('Y-m-d') : null;
 
         return response()->json(['success' => true, 'row' => $responseRow]);
     }
@@ -186,7 +208,7 @@ class OperationController extends Controller
     {
         try {
             // Ito ang magbubura sa database sa Aiven
-            \App\Models\ActivityLog::query()->delete(); 
+            \App\Models\ActivityLog::query()->delete();
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);

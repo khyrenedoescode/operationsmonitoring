@@ -17,9 +17,11 @@ class Operation extends Model
         'prop_remark',
         'uiux_assign',
         'uiux_status',
+        'uiux_due',  // ← uiux_due added
         'dev_assign',
         'dev_fe',
         'dev_be',
+        'dev_due',  // ← dev_due added
         'fe',
         'be',
         'status',
@@ -31,9 +33,11 @@ class Operation extends Model
     ];
 
     protected $casts = [
-        'fe'  => 'integer',
-        'be'  => 'integer',
+        'fe' => 'integer',
+        'be' => 'integer',
         'due' => 'date:Y-m-d',
+        'uiux_due' => 'date:Y-m-d',  // ← add
+        'dev_due' => 'date:Y-m-d',  // ← add
     ];
 
     /**
@@ -50,7 +54,7 @@ class Operation extends Model
         // Strip punctuation from each word for cleaner initials
         $words = preg_split('/\s+/', trim($client));
         $words = array_map(fn($w) => preg_replace('/[^a-zA-Z0-9]/', '', $w), $words);
-        $words = array_values(array_filter($words)); // remove empty
+        $words = array_values(array_filter($words));  // remove empty
 
         $prefix = '';
 

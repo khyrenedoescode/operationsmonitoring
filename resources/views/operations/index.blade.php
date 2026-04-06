@@ -705,6 +705,7 @@ tbody tr:hover .edit-hint{opacity:1;}
       <div class="form-group"><label>UI/UX Status</label>
         <select id="f-uiux-status"><option>On Hold</option><option>Done</option><option>Revisions</option></select>
       </div>
+      <div class="form-group"><label>UI/UX Due Date</label><input type="date" id="f-uiux-due" /></div>
       <div class="form-group"><label>UI/UX Assigned</label><input type="text" id="f-uiux-assign" placeholder="Name..." /></div>
       <div class="form-group"><label>Dev Assigned</label><input type="text" id="f-dev-assign" placeholder="Name..." /></div>
       <div class="form-group"><label>Front-end Status</label>
@@ -716,6 +717,7 @@ tbody tr:hover .edit-hint{opacity:1;}
       <div class="form-group"><label>Status</label>
         <select id="f-status"><option>Done</option><option>On Hold</option><option>Revisions</option></select>
       </div>
+      <div class="form-group"><label>Dev Due Date</label><input type="date" id="f-dev-due" /></div>
       <div class="form-group"><label>Due Date</label><input type="date" id="f-due" /></div>
       <div class="form-group"><label>Frontend %</label><input type="number" id="f-fe" min="0" max="100" placeholder="0–100" /></div>
       <div class="form-group"><label>Backend %</label><input type="number" id="f-be" min="0" max="100" placeholder="0–100" /></div>
@@ -1231,12 +1233,22 @@ function renderRow(r,i,anim=false){
         <span class="assignee-name editable" contenteditable="true" spellcheck="false" onblur="save(${i},'uiux_assign',this);rerenderAv('u',${i})" data-placeholder="Name...">${escHtml(r.uiux_assign==='—'?'':r.uiux_assign)}</span>
       </div>
     </td>
-    <td>${uiuxBadgeHtml(r.uiux_status, i)}</td>
-    <td class="col-sep">
-      <div class="assignee"><div class="avatar ${avc(r.dev_assign)}" id="dav-${i}">${ini(r.dev_assign)}</div>
-        <span class="assignee-name editable" contenteditable="true" spellcheck="false" onblur="save(${i},'dev_assign',this);rerenderAv('d',${i})" data-placeholder="Name...">${escHtml(r.dev_assign==='—'?'':r.dev_assign)}</span>
-      </div>
-    </td>
+    <td>
+  ${uiuxBadgeHtml(r.uiux_status, i)}
+  <div style="margin-top:8px;">
+    <div class="final-header-row" style="margin-bottom:4px;">
+      <span class="final-date-str" id="uiux-due-str-${i}" style="font-size:.7rem;color:var(--muted2);">${r.uiux_due ? finalDateFmt(r.uiux_due) : ''}</span>
+      <span style="position:relative;display:inline-flex;align-items:center;">
+        <button class="cal-icon-btn" onclick="triggerDueById('uiux-due-input-${i}')" title="Pick UI/UX due date">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        </button>
+        <input class="due-input" type="date" id="uiux-due-input-${i}" value="${r.uiux_due||''}"
+          onchange="saveVal(${i},'uiux_due',this.value);rerenderUiuxDue(${i},this.value)" />
+      </span>
+    </div>
+    <div id="uiux-due-notif-${i}">${getDueDateNotification(r.uiux_due)}</div>
+  </div>
+  </td>
     <td>
       <div class="dev-pill-group"><div class="dev-group-label">Front-end</div>
         <select class="dev-select-minimal" onchange="saveVal(${i},'dev_fe',this.value)">
@@ -1253,6 +1265,20 @@ function renderRow(r,i,anim=false){
           <option value="In Progress"${r.dev_be==='In Progress'?' selected':''}>In Progress</option>
           <option value="Pending"${r.dev_be==='Pending'?' selected':''}>Pending</option>
         </select>
+      </div>
+      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px;">
+        <div class="final-header-row" style="margin-bottom:4px;">
+          <span style="font-size:.62rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;">Dev Due</span>
+          <span class="final-date-str" id="dev-due-str-${i}" style="font-size:.7rem;color:var(--muted2);margin-left:6px;">${r.dev_due ? finalDateFmt(r.dev_due) : ''}</span>
+          <span style="position:relative;display:inline-flex;align-items:center;">
+            <button class="cal-icon-btn" onclick="triggerDueById('dev-due-input-${i}')" title="Pick Dev due date">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            </button>
+            <input class="due-input" type="date" id="dev-due-input-${i}" value="${r.dev_due||''}"
+              onchange="saveVal(${i},'dev_due',this.value);rerenderDevDue(${i},this.value)" />
+          </span>
+        </div>
+        <div id="dev-due-notif-${i}">${getDueDateNotification(r.dev_due)}</div>
       </div>
     </td>
     <td>
@@ -1417,7 +1443,32 @@ function rerenderDue(i,val){
   logActivity('edit', `Set due date for ${rows[i].client}`, val||'(cleared)');
   toast('Due date updated ✓');
 }
-function triggerDueById(i){const inp=document.getElementById('due-input-'+i);if(inp){inp.showPicker?.()||inp.click();}}
+
+function rerenderUiuxDue(i, val){
+    rows[i].uiux_due = val;
+    const notif = document.getElementById('uiux-due-notif-'+i);
+    const dstr  = document.getElementById('uiux-due-str-'+i);
+    if(notif) notif.innerHTML = getDueDateNotification(val);
+    if(dstr)  dstr.textContent = finalDateFmt(val);
+    logActivity('edit', `Set UI/UX due date for ${rows[i].client}`, val || '(cleared)');
+    toast('UI/UX due date updated ✓');
+}
+
+function rerenderDevDue(i, val){
+    rows[i].dev_due = val;
+    const notif = document.getElementById('dev-due-notif-'+i);
+    const dstr  = document.getElementById('dev-due-str-'+i);
+    if(notif) notif.innerHTML = getDueDateNotification(val);
+    if(dstr)  dstr.textContent = finalDateFmt(val);
+    logActivity('edit', `Set Dev due date for ${rows[i].client}`, val || '(cleared)');
+    toast('Dev due date updated ✓');
+}
+
+function triggerDueById(idOrIndex) {
+    const id = typeof idOrIndex === 'number' ? `due-input-${idOrIndex}` : idOrIndex;
+    const inp = document.getElementById(id);
+    if(inp){ inp.showPicker?.() || inp.click(); }
+}
 
 /* ════════════════════════════════════════════════
    STATUS DROPDOWN
@@ -1546,7 +1597,7 @@ function restoreRow(ti){
     if(data.success){
       trash.splice(ti,1);
       const rv=data.row;
-      rows.push({id:rv.id,client:rv.client,tag:rv.tag,stage:rv.stage,prop_assign:rv.prop_assign,prop_remark:rv.prop_remark||'',uiux_assign:rv.uiux_assign||'—',uiux_status:rv.uiux_status||'On Hold',dev_assign:rv.dev_assign,dev_fe:rv.dev_fe,dev_be:rv.dev_be,fe:rv.fe,be:rv.be,status:rv.status,due:rv.due?rv.due.replace(' 00:00:00',''):'',final_remark:rv.final_remark||'',last_edited_by:'',last_edited_field:'',updated_at:'just now'});
+      rows.push({id:rv.id,client:rv.client,tag:rv.tag,stage:rv.stage,prop_assign:rv.prop_assign,prop_remark:rv.prop_remark||'',uiux_assign:rv.uiux_assign||'—',uiux_status:rv.uiux_status||'On Hold',dev_assign:rv.dev_assign,dev_fe:rv.dev_fe,dev_be:rv.dev_be,fe:rv.fe,be:rv.be,status:rv.status,due:rv.due?rv.due.replace(' 00:00:00',''):'',uiux_due: rv.uiux_due ? rv.uiux_due.replace(' 00:00:00','') : '',dev_due:  rv.dev_due  ? rv.dev_due.replace(' 00:00:00','')  : '',final_remark:rv.final_remark||'',last_edited_by:'',last_edited_field:'',updated_at:'just now'});
       renderTable();renderBin();updateBinBadge();
       activityLog.unshift({type:'restore', message: `${rv.client} restored from Bin`, ts: Date.now()});
       updateLogBadge();
@@ -1687,6 +1738,8 @@ async function addRow() {
         dev_be: document.getElementById('f-dev-be').value || '',
         status: document.getElementById('f-status').value,
         due: document.getElementById('f-due').value || null,
+        uiux_due: document.getElementById('f-uiux-due').value || null,
+        dev_due: document.getElementById('f-dev-due').value || null,
         final_remark: document.getElementById('f-final-remark').value.trim() || '',
         edited_by: 'User'
     };
@@ -1725,6 +1778,8 @@ async function addRow() {
                 be: r.be,
                 status: r.status,
                 due: r.due ? r.due.replace(' 00:00:00', '') : '',
+                uiux_due: r.uiux_due || '',
+                dev_due:  r.dev_due  || '',
                 final_remark: r.final_remark || '',
                 last_edited_by: '',
                 last_edited_field: '',
@@ -1733,10 +1788,10 @@ async function addRow() {
 
             // 4. UI Cleanup
             closeModal();
-            ['f-client', 'f-prop-assign', 'f-uiux-assign', 'f-dev-assign', 'f-fe', 'f-be', 'f-due', 'f-prop-remark', 'f-final-remark'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = '';
-            });
+            ['f-client', 'f-prop-assign', 'f-uiux-assign', 'f-uiux-due',
+            'f-dev-assign', 'f-dev-due', 'f-fe', 'f-be', 'f-due',
+            'f-prop-remark', 'f-final-remark']
+            .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
 
             // 5. Re-draw the table and show animations
             renderTable();
