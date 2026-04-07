@@ -3468,89 +3468,89 @@
         <thead>
           <tr>
             <!-- FIX: Delete column header background matched to adjacent boxes -->
-            <th style="background:var(--surface2);border-bottom:1px solid var(--border);border-right:1px solid var(--border);"></th>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6" />
-              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-              <path d="M10 11v6M14 11v6" />
-              <path d="M9 6V4h6v2" />
-            </svg>
-            <span class="delete-th-label">Delete</span>
+            <th style="background:var(--surface2);border-bottom:1px solid var(--border);border-right:1px solid var(--border);">
+              <div class="delete-th-inner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6M14 11v6" />
+                  <path d="M9 6V4h6v2" />
+                </svg>
+                <span class="delete-th-label">Delete</span>
+              </div>
+            </th>
+            style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--border);color:var(--muted2);">
+            </th>
+            <th colspan="2" class="group-proposal col-sep"
+              style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);">
+              📋 Proposal Phase</th>
+            <th colspan="2"
+              style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);border-left:1px solid var(--border);color:var(--accent);">
+              🎨 UI/UX</th>
+            <th colspan="4" class="group-dev col-sep"
+              style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);">
+              ⚙ Development Phase</th>
+            <th colspan="1" class="group-final"
+              style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);border-left:1px solid var(--border);color:var(--onhold);">
+              ⊞ Final</th>
+          </tr>
+          <tr>
+            <th class="delete-th" style="background:var(--surface3);border-bottom:2px solid var(--border);"></th>
+
+            <!-- Sortable: Client Name -->
+            <th class="sortable" onclick="sortTable('client')" title="Sort by Client">
+              Client Name
+              <span class="sort-indicator" id="sort-client"><svg viewBox="0 0 10 6" class="si-up">
+                  <path d="M1 5l4-4 4 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+                </svg><svg viewBox="0 0 10 6" class="si-down">
+                  <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+                </svg></span>
+            </th>
+
+            <!-- Proposal Phase columns -->
+            <th class="col-sep">
+              <div class="subhead"><span class="subhead-dot sd-proposal"></span>Proposal Status</div>
+            </th>
+            <th>Proposal Remarks</th>
+
+            <!-- UI/UX Assigned & Status — NO divider between them, merged feel -->
+            <th class="col-sep" style="border-right:none !important;">
+              UI/UX Assigned
+            </th>
+            <th style="border-left:none !important;">
+              <div class="subhead"><span class="subhead-dot sd-proposal"></span>UI/UX Status</div>
+            </th>
+
+            <!-- Dev Phase columns — separator here to divide from Proposal -->
+            <th class="col-sep" style="border-right:none !important;">Dev Assigned</th>
+            <th style="border-left:none !important;">
+              <div class="subhead"><span class="subhead-dot sd-dev"></span>Status</div>
+            </th>
+            <th>Progress</th>
+
+            <!-- Overall Status -->
+            <th>
+              <div class="subhead"><span class="subhead-dot sd-status"></span>Dev Status</div>
+            </th>
+
+            <!-- Final Remarks -->
+            <th style="border-left:1px solid var(--border);padding:10px 14px;text-align:left;">Final Remarks</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
     </div>
-    </th>
-    <th
-      style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--border);color:var(--muted2);">
-    </th>
-    <th colspan="2" class="group-proposal col-sep"
-      style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);">
-      📋 Proposal Phase</th>
-    <th colspan="2"
-      style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);border-left:1px solid var(--border);color:var(--accent);">
-      🎨 UI/UX</th>
-    <th colspan="4" class="group-dev col-sep"
-      style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);">
-      ⚙ Development Phase</th>
-    <th colspan="1" class="group-final"
-      style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);border-left:1px solid var(--border);color:var(--onhold);">
-      ⊞ Final</th>
-    </tr>
-    <tr>
-      <th class="delete-th" style="background:var(--surface3);border-bottom:2px solid var(--border);"></th>
 
-      <!-- Sortable: Client Name -->
-      <th class="sortable" onclick="sortTable('client')" title="Sort by Client">
-        Client Name
-        <span class="sort-indicator" id="sort-client"><svg viewBox="0 0 10 6" class="si-up">
-            <path d="M1 5l4-4 4 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
-          </svg><svg viewBox="0 0 10 6" class="si-down">
-            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
-          </svg></span>
-      </th>
-
-      <!-- Proposal Phase columns -->
-      <th class="col-sep">
-        <div class="subhead"><span class="subhead-dot sd-proposal"></span>Proposal Status</div>
-      </th>
-      <th>Proposal Remarks</th>
-
-      <!-- UI/UX Assigned & Status — NO divider between them, merged feel -->
-      <th class="col-sep" style="border-right:none !important;">
-        UI/UX Assigned
-      </th>
-      <th style="border-left:none !important;">
-        <div class="subhead"><span class="subhead-dot sd-proposal"></span>UI/UX Status</div>
-      </th>
-
-      <!-- Dev Phase columns — separator here to divide from Proposal -->
-      <th class="col-sep" style="border-right:none !important;">Dev Assigned</th>
-      <th style="border-left:none !important;">
-        <div class="subhead"><span class="subhead-dot sd-dev"></span>Status</div>
-      </th>
-      <th>Progress</th>
-
-      <!-- Overall Status -->
-      <th>
-        <div class="subhead"><span class="subhead-dot sd-status"></span>Dev Status</div>
-      </th>
-
-      <!-- Final Remarks -->
-      <th style="border-left:1px solid var(--border);padding:10px 14px;text-align:left;">Final Remarks</th>
-    </tr>
-    </thead>
-    <tbody id="table-body"></tbody>
-    </table>
-  </div>
-
-  <!-- ══ FOOTER ══ -->
-  <div class="footer">
-    <div class="footer-left" id="footer-count">0 clients tracked</div>
-    <div class="footer-right">
-      <div class="legend-item"><span class="ldot" style="background:var(--done)"></span>Done</div>
-      <div class="legend-item"><span class="ldot" style="background:var(--onhold)"></span>On Hold</div>
-      <div class="legend-item"><span class="ldot" style="background:var(--revision)"></span>Revisions</div>
+    <!-- ══ FOOTER ══ -->
+    <div class="footer">
+      <div class="footer-left" id="footer-count">0 clients tracked</div>
+      <div class="footer-right">
+        <div class="legend-item"><span class="ldot" style="background:var(--done)"></span>Done</div>
+        <div class="legend-item"><span class="ldot" style="background:var(--onhold)"></span>On Hold</div>
+        <div class="legend-item"><span class="ldot" style="background:var(--revision)"></span>Revisions</div>
+      </div>
     </div>
-  </div>
   </div>
 
   <!-- ══ ARCHIVE DRAWER ══ -->
