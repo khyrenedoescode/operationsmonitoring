@@ -3482,7 +3482,7 @@
         <thead>
           <tr>
             <!-- FIX: Delete column header background matched to adjacent boxes -->
-            <th style="background:var(--surface2);border-bottom:1px solid var(--border);border-right:1px solid var(--border);">
+            <th style="background:var(--surface2);border-bottom:1px solid var(--border);border-right:1px solid var(--border);"></th>
               <div class="delete-th-inner">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                   stroke-linejoin="round">
@@ -3496,9 +3496,7 @@
             </th>
             <th style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--border);color:var(--muted2);">
             </th>
-            <th colspan="2" class="group-proposal col-sep"
-              style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);">
-              📋 Proposal Phase</th>
+            <th colspan="3" class="group-proposal" style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);border-left:1px solid var(--border);">📋 Proposal Phase</th>
             <th colspan="2"
               style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);border-left:1px solid var(--border);color:var(--accent);">
               🎨 UI/UX</th>
@@ -4181,21 +4179,102 @@
         return !tr || tr.style.display !== 'none';
       });
 
-      // ── Title & meta
+      const pageW = doc.internal.pageSize.getWidth();
+      const pageH = doc.internal.pageSize.getHeight();
+
+      // ── Soft pink background
+      doc.setFillColor(253, 246, 240);
+      doc.rect(0, 0, pageW, pageH, 'F');
+
+      // ── Top accent bar gradient simulation
+      doc.setFillColor(201, 99, 122);
+      doc.rect(0, 0, pageW, 1.2, 'F');
+
+      // ── Header section background
+      doc.setFillColor(255, 248, 245);
+      doc.roundedRect(10, 6, pageW - 20, 22, 3, 3, 'F');
+
+      // ── Logo / Title
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(16);
+      doc.setFontSize(18);
       doc.setTextColor(201, 99, 122);
-      doc.text('Operations Monitoring', 14, 16);
+      doc.text('Operations Monitoring', 18, 16);
 
+      // ── Subtitle
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
+      doc.setFontSize(7.5);
       doc.setTextColor(160, 128, 112);
-      doc.text(`Exported ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} · ${visible.length} record${visible.length !== 1 ? 's' : ''}`, 14, 22);
+      doc.text('Web Development Pipeline', 18, 21.5);
 
-      // ── Table
-      const head = [
-        ['Client', 'Stage', 'Proposal', 'UI/UX Assigned', 'UI/UX Status', 'Dev Assigned', 'FE%', 'BE%', 'Status', 'Due Date']
+      // ── Meta info (right side)
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+      });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(160, 128, 112);
+      doc.text(`Exported: ${dateStr}`, pageW - 18, 14, {
+        align: 'right'
+      });
+      doc.text(`${visible.length} record${visible.length !== 1 ? 's' : ''}`, pageW - 18, 19, {
+        align: 'right'
+      });
+
+      // ── Summary pills (Done / On Hold / Revisions counts)
+      const doneCount = visible.filter(r => r.status === 'Done').length;
+      const holdCount = visible.filter(r => r.status === 'On Hold').length;
+      const revCount = visible.filter(r => r.status === 'Revisions').length;
+
+      const pills = [{
+          label: `● Done  ${doneCount}`,
+          color: [90, 154, 106]
+        },
+        {
+          label: `● On Hold  ${holdCount}`,
+          color: [176, 128, 32]
+        },
+        {
+          label: `● Revisions  ${revCount}`,
+          color: [201, 96, 112]
+        },
       ];
+      let px = 18;
+      pills.forEach(p => {
+        doc.setFillColor(p.color[0], p.color[1], p.color[2], 0.1);
+        doc.setDrawColor(p.color[0], p.color[1], p.color[2]);
+        doc.setLineWidth(0.3);
+        const tw = doc.getTextWidth(p.label) + 6;
+        doc.roundedRect(px, 23.5, tw, 4.5, 1.2, 1.2, 'FD');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(6.5);
+        doc.setTextColor(...p.color);
+        doc.text(p.label, px + 3, 26.6);
+        px += tw + 4;
+      });
+
+      // ── Divider
+      doc.setDrawColor(232, 213, 196);
+      doc.setLineWidth(0.4);
+      doc.line(10, 30, pageW - 10, 30);
+
+      // ── Status color helper
+      const statusColor = s => {
+        if (s === 'Done') return [90, 154, 106];
+        if (s === 'On Hold') return [176, 128, 32];
+        if (s === 'Revisions') return [201, 96, 112];
+        return [160, 128, 112];
+      };
+
+      const head = [
+        [
+          'Client', 'Stage', 'Proposal', 'UI/UX Assigned', 'UI/UX Status',
+          'Dev Assigned', 'FE%', 'BE%', 'Status', 'Due Date'
+        ]
+      ];
+
       const body = visible.map(r => [
         r.client + (r.tag ? `\n${r.tag}` : ''),
         r.stage || '',
@@ -4206,36 +4285,51 @@
         (r.fe || 0) + '%',
         (r.be || 0) + '%',
         r.status || '',
-        r.due || '—'
+        r.due ? new Date(r.due + 'T00:00:00').toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        }) : '—'
       ]);
-
-      const statusColor = s => {
-        if (s === 'Done') return [90, 154, 106];
-        if (s === 'On Hold') return [176, 128, 32];
-        if (s === 'Revisions') return [201, 96, 112];
-        return [160, 128, 112];
-      };
 
       doc.autoTable({
         head,
         body,
-        startY: 27,
+        startY: 33,
+        margin: {
+          left: 10,
+          right: 10
+        },
         styles: {
           font: 'helvetica',
-          fontSize: 7.5,
-          cellPadding: 3,
+          fontSize: 7.8,
+          cellPadding: {
+            top: 4,
+            bottom: 4,
+            left: 4,
+            right: 4
+          },
           valign: 'middle',
           overflow: 'linebreak',
+          textColor: [61, 43, 34],
+          lineColor: [232, 213, 196],
+          lineWidth: 0.25,
         },
         headStyles: {
           fillColor: [242, 230, 213],
           textColor: [122, 92, 80],
           fontStyle: 'bold',
           fontSize: 7,
+          cellPadding: {
+            top: 5,
+            bottom: 5,
+            left: 4,
+            right: 4
+          },
         },
         columnStyles: {
           0: {
-            cellWidth: 32
+            cellWidth: 30
           },
           1: {
             cellWidth: 28
@@ -4250,26 +4344,32 @@
             cellWidth: 22
           },
           5: {
-            cellWidth: 28
+            cellWidth: 26
           },
           6: {
-            cellWidth: 12
+            cellWidth: 10,
+            halign: 'center'
           },
           7: {
-            cellWidth: 12
+            cellWidth: 10,
+            halign: 'center'
           },
           8: {
-            cellWidth: 22
+            cellWidth: 24,
+            halign: 'center'
           },
           9: {
-            cellWidth: 22
+            cellWidth: 26,
+            halign: 'center'
           },
         },
         alternateRowStyles: {
-          fillColor: [253, 246, 240]
+          fillColor: [255, 252, 250]
         },
+        rowPageBreak: 'avoid',
+
         didDrawCell(data) {
-          // Color the Status column cells
+          // ── Styled status badge
           if (data.section === 'body' && data.column.index === 8) {
             const val = data.cell.raw;
             const [r, g, b] = statusColor(val);
@@ -4279,25 +4379,83 @@
               width,
               height
             } = data.cell;
-            doc.setFillColor(r, g, b, 0.12);
-            doc.setDrawColor(r, g, b);
-            doc.setLineWidth(0.3);
-            doc.roundedRect(x + 1, y + 1.5, width - 2, height - 3, 2, 2, 'FD');
-            doc.setTextColor(r, g, b);
-            doc.setFontSize(7);
+            const bw = Math.min(width - 4, 20),
+              bh = 5.5;
+            const bx = x + (width - bw) / 2,
+              by = y + (height - bh) / 2;
+
+            // Badge background
+            doc.setFillColor(r, g, b);
+            doc.roundedRect(bx, by, bw, bh, 1.5, 1.5, 'F');
+
+            // Badge text
             doc.setFont('helvetica', 'bold');
-            doc.text(val, x + width / 2, y + height / 2, {
+            doc.setFontSize(6.5);
+            doc.setTextColor(255, 255, 255);
+            doc.text(val, bx + bw / 2, by + bh / 2 + 0.5, {
               align: 'center',
               baseline: 'middle'
             });
           }
+
+          // ── Progress bar for FE% and BE%
+          if (data.section === 'body' && (data.column.index === 6 || data.column.index === 7)) {
+            const val = parseInt(data.cell.raw) || 0;
+            const {
+              x,
+              y,
+              width,
+              height
+            } = data.cell;
+            const barW = width - 6,
+              barH = 2.5;
+            const bx = x + 3,
+              by = y + height - 5;
+
+            // Track
+            doc.setFillColor(232, 213, 196);
+            doc.roundedRect(bx, by, barW, barH, 0.8, 0.8, 'F');
+
+            // Fill
+            if (val > 0) {
+              doc.setFillColor(201, 99, 122);
+              doc.roundedRect(bx, by, (barW * val) / 100, barH, 0.8, 0.8, 'F');
+            }
+          }
+
+          // ── UI/UX status dot
+          if (data.section === 'body' && data.column.index === 4) {
+            const val = data.cell.raw;
+            const [r, g, b] = statusColor(val);
+            const {
+              x,
+              y,
+              height
+            } = data.cell;
+            doc.setFillColor(r, g, b);
+            doc.circle(x + 4, y + height / 2, 1.2, 'F');
+          }
         },
+
         didParseCell(data) {
           if (data.section === 'body' && data.column.index === 8) {
             data.cell.styles.textColor = [255, 255, 255];
             data.cell.styles.fillColor = [255, 255, 255];
           }
         }
+      });
+
+      // ── Footer
+      const finalY = doc.lastAutoTable.finalY + 5;
+      doc.setDrawColor(232, 213, 196);
+      doc.setLineWidth(0.3);
+      doc.line(10, finalY, pageW - 10, finalY);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.5);
+      doc.setTextColor(160, 128, 112);
+      doc.text('Operations Monitoring · Web Development Pipeline', 10, finalY + 4);
+      doc.text(`Page 1`, pageW - 10, finalY + 4, {
+        align: 'right'
       });
 
       hideLoading();
