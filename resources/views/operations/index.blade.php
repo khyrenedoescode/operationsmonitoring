@@ -425,8 +425,10 @@
     .wrapper {
       position: relative;
       z-index: 1;
-      padding: 70px 48px 80px;
+      padding: 70px 72px 80px;
       width: 100%;
+      max-width: 1600px;
+      margin: 0 auto;
       box-sizing: border-box;
     }
 
@@ -435,7 +437,8 @@
     ══════════════════════════════════════════════ */
     .header {
       display: flex;
-      align-items: flex-end;
+      align-items: center;
+      /* was: flex-end */
       justify-content: space-between;
       margin-bottom: 48px;
       padding-bottom: 32px;
@@ -467,9 +470,11 @@
 
     .header-right {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       align-items: center;
       flex-wrap: wrap;
+      justify-content: flex-end;
+      /* add this */
     }
 
     .stat-pill {
