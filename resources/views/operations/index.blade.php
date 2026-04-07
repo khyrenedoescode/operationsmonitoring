@@ -871,6 +871,18 @@ let sortDir = 'asc';
    HELPERS
 ════════════════════════════════════════════════ */
 function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ════ ENTER TO SAVE INLINE EDITABLE FIELDS ════ */
+document.addEventListener('keydown', e => {
+  if(e.key !== 'Enter') return;
+  const el = e.target;
+  if(!el.classList.contains('editable')) return;
+  // Let remarks/final-text use Enter for new lines
+  if(el.classList.contains('remark-text') || el.classList.contains('final-text')) return;
+  e.preventDefault();
+  el.blur(); // triggers the onblur save
+});
+
 function ini(n){ if(!n||n==='—'||n.trim()==='') return '?'; return n.trim().split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2); }
 function avc(s){ if(!s||s==='—') return 'av1'; return AV_COLORS[s.charCodeAt(0)%4]; }
 function fmtTime(ts){
