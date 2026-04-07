@@ -425,20 +425,20 @@
     .wrapper {
       position: relative;
       z-index: 1;
-      padding: 50px 32px 64px;
+      padding: 70px 48px 80px;
       width: 100%;
       box-sizing: border-box;
     }
 
     /* ══════════════════════════════════════════════
    HEADER
-══════════════════════════════════════════════ */
+    ══════════════════════════════════════════════ */
     .header {
       display: flex;
       align-items: flex-end;
       justify-content: space-between;
-      margin-bottom: 32px;
-      padding-bottom: 22px;
+      margin-bottom: 48px;
+      padding-bottom: 32px;
       border-bottom: 1px solid var(--border);
       animation: slideDown .5s ease both;
       flex-wrap: wrap;
@@ -448,7 +448,7 @@
     }
 
     .header-left h1 {
-      font-size: 2.1rem;
+      font-size: 2.8rem;
       font-weight: 800;
       letter-spacing: -.5px;
       background: linear-gradient(135deg, var(--accent), var(--accent3));
@@ -458,16 +458,16 @@
     }
 
     .header-left p {
-      font-size: .68rem;
+      font-size: .72rem;
       color: var(--muted);
-      margin-top: 5px;
+      margin-top: 10px;
       letter-spacing: .1em;
       text-transform: uppercase;
     }
 
     .header-right {
       display: flex;
-      gap: 9px;
+      gap: 12px;
       align-items: center;
       flex-wrap: wrap;
     }
@@ -476,7 +476,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 14px;
+      padding: 8px 18px;
       border-radius: 999px;
       border: 1px solid var(--border);
       background: var(--surface);
