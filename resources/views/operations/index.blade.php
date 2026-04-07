@@ -3482,7 +3482,7 @@
         <thead>
           <tr>
             <!-- FIX: Delete column header background matched to adjacent boxes -->
-            <th style="background:var(--surface2);border-bottom:1px solid var(--border);border-right:1px solid var(--border);"></th>
+            <th style="background:var(--surface2);border-bottom:1px solid var(--border);border-right:1px solid var(--border);">
               <div class="delete-th-inner">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                   stroke-linejoin="round">
@@ -3496,7 +3496,9 @@
             </th>
             <th style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--border);color:var(--muted2);">
             </th>
-            <th colspan="3" class="group-proposal" style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);border-left:1px solid var(--border);">📋 Proposal Phase</th>
+            <th colspan="2" class="group-proposal col-sep"
+              style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);">
+              📋 Proposal Phase</th>
             <th colspan="2"
               style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);border-left:1px solid var(--border);color:var(--accent);">
               🎨 UI/UX</th>
