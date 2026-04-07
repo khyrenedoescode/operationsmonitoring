@@ -466,7 +466,7 @@ tbody tr:hover .edit-hint{opacity:1;}
   align-items:stretch !important;
   cursor:pointer;
   padding:0 !important;
-  overflow:hidden;
+  overflow:visible;
   border-radius:10px !important;
 }
 .od-client-header{
@@ -492,6 +492,8 @@ tbody tr:hover .edit-hint{opacity:1;}
   border-top:1px solid rgba(201,96,112,.15);
 }
 .od-client-item.od-open .od-detail-wrap{display:flex;}
+.od-detail-wrap{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.od-client-item.od-open .od-detail-wrap{max-height:300px;}
 .od-detail-row{
   display:flex;align-items:center;gap:8px;
   font-size:.74rem;color:var(--text);
@@ -856,9 +858,9 @@ const ROUTES    = {
   clearLogs: "{{ route('logs.clear') }}",
 };
 
-let rows = @json($rows);
-let trash = @json($trash);
-let activityLog = @json($logs);
+let rows = JSON.parse('<?= json_encode($rows, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>');
+let trash = JSON.parse('<?= json_encode($trash, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>');
+let activityLog = JSON.parse('<?= json_encode($logs, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>');
 let pendingDeleteIdx = null;
 
 // Sort state
