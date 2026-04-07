@@ -152,7 +152,7 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;height:3px;background
 /* ══════════════════════════════════════════════
    TABLE
 ══════════════════════════════════════════════ */
-.table-wrap{border-radius:16px;border:1px solid var(--border);overflow-x:auto;background:var(--surface);box-shadow:0 8px 40px var(--shadow);transition:background .4s,border-color .4s,box-shadow .4s;animation:fadeUp .55s ease .1s both;}
+.table-wrap{border-radius:16px;border:1px solid var(--border);overflow-x:auto;background:var(--surface);box-shadow:0 8px 40px var(--shadow);transition:background .4s,border-color .4s,box-shadow .4s;animation:fadeUp .55s ease .1s both;cursor:grab;}
 .table-wrap::-webkit-scrollbar{height:8px;}
 .table-wrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
 .table-wrap::-webkit-scrollbar-thumb:hover{background:var(--muted);}
@@ -2110,6 +2110,28 @@ function clearOverdueFilter(){
 ════════════════════════════════════════════════ */
 renderTable();
 setTimeout(checkOverdueOnLoad, 800); // slight delay so table renders first
+
+/* ════ DRAG TO SCROLL TABLE ════ */
+(function(){
+  const wrap = document.querySelector('.table-wrap');
+  let isDown = false, startX, scrollLeft;
+  wrap.addEventListener('mousedown', e => {
+    if(e.target.closest('button,select,input,[contenteditable="true"],.status-badge')) return;
+    isDown = true;
+    wrap.style.cursor = 'grabbing';
+    startX = e.pageX - wrap.offsetLeft;
+    scrollLeft = wrap.scrollLeft;
+  });
+  document.addEventListener('mouseup', () => { isDown = false; wrap.style.cursor = 'grab'; });
+  wrap.addEventListener('mouseleave', () => { isDown = false; wrap.style.cursor = 'grab'; });
+  wrap.addEventListener('mousemove', e => {
+    if(!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - wrap.offsetLeft;
+    wrap.scrollLeft = scrollLeft - (x - startX) * 1.5;
+  });
+})();
+
 </script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
