@@ -20,6 +20,8 @@ class Operation extends Model
         'uiux_due',  // ← uiux_due added
         'dev_assign',
         'dev_fe',
+        'is_archived',
+        'archived_at',
         'dev_be',
         'dev_due',  // ← dev_due added
         'fe',
@@ -38,6 +40,8 @@ class Operation extends Model
         'due' => 'date:Y-m-d',
         'uiux_due' => 'date:Y-m-d',  // ← add
         'dev_due' => 'date:Y-m-d',  // ← add
+        'is_archived' => 'boolean',
+        'archived_at' => 'datetime',
     ];
 
     /**

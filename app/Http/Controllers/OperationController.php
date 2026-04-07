@@ -11,7 +11,7 @@ class OperationController extends Controller
     /* ─── INDEX ─── */
     public function index()
     {
-        $rows = Operation::orderBy('created_at', 'asc')->get()->map(function ($op) {
+        $rows = Operation::where('is_archived', false)->orderBy('created_at', 'asc')->get()->map(function ($op) {
             $op->due = $op->due ? $op->due->format('Y-m-d') : null;
             $op->uiux_due = $op->uiux_due ? $op->uiux_due->format('Y-m-d') : null;  // ← add
             $op->dev_due = $op->dev_due ? $op->dev_due->format('Y-m-d') : null;  // ← add
@@ -19,6 +19,7 @@ class OperationController extends Controller
         });
 
         $trash = Operation::onlyTrashed()->orderBy('deleted_at', 'desc')->get();
+        $archived = Operation::where('is_archived', true)->orderBy('archived_at', 'desc')->get();
         $logs = ActivityLog::orderBy('created_at', 'desc')->limit(200)->get();
 
         $isMobile = preg_match('/(android|iphone|ipad|mobile)/i', request()->header('User-Agent'));
@@ -27,7 +28,7 @@ class OperationController extends Controller
             return view('operations.mobile', compact('rows', 'trash', 'logs'));
         }
 
-        return view('operations.index', compact('rows', 'trash', 'logs'));
+        return view('operations.index', compact('rows', 'trash', 'archived', 'logs'));
     }
 
     /* ─── STORE ─── */
@@ -201,6 +202,45 @@ class OperationController extends Controller
         ]);
 
         return response()->json(['success' => true]);
+    }
+
+    /* ─── ARCHIVE ─── */
+    public function archive($id)
+    {
+        $operation = Operation::findOrFail($id);
+        $operation->is_archived = true;
+        $operation->archived_at = now();
+        $operation->save();
+
+        ActivityLog::create([
+            'type' => 'edit',
+            'message' => $operation->client . ' moved to Archive',
+            'user' => request()->input('edited_by', 'System'),
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    /* ─── UNARCHIVE ─── */
+    public function unarchive($id)
+    {
+        $operation = Operation::findOrFail($id);
+        $operation->is_archived = false;
+        $operation->archived_at = null;
+        $operation->save();
+
+        ActivityLog::create([
+            'type' => 'restore',
+            'message' => $operation->client . ' restored from Archive',
+            'user' => request()->input('edited_by', 'System'),
+        ]);
+
+        $responseRow = $operation->toArray();
+        $responseRow['due'] = $operation->due ? $operation->due->format('Y-m-d') : null;
+        $responseRow['uiux_due'] = $operation->uiux_due ? $operation->uiux_due->format('Y-m-d') : null;
+        $responseRow['dev_due'] = $operation->dev_due ? $operation->dev_due->format('Y-m-d') : null;
+
+        return response()->json(['success' => true, 'row' => $responseRow]);
     }
 
     /* ─── CLEAR LOGS (Permanently delete Activity Logs) ─── */

@@ -18,5 +18,9 @@ Route::delete('/operations/{operation}', [OperationController::class, 'destroy']
 Route::post('/operations/{id}/restore', [OperationController::class, 'restore'])->name('operations.restore');
 Route::delete('/operations/{id}/force', [OperationController::class, 'forceDelete'])->name('operations.force');
 
+// Archive Actions
+Route::post('/operations/{id}/archive', [OperationController::class, 'archive'])->name('operations.archive');
+Route::post('/operations/{id}/unarchive', [OperationController::class, 'unarchive'])->name('operations.unarchive');
+
 // Clear Logs
 Route::delete('/activity-logs/clear', [OperationController::class, 'clearLogs'])->name('logs.clear');
