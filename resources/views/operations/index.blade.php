@@ -78,6 +78,10 @@
       min-height: 100vh;
       overflow-x: hidden;
       transition: background .4s ease, color .4s ease;
+      font-size: 13px;
+      /* add this */
+      zoom: 0.9;
+      /* add this */
     }
 
     body::before {
@@ -425,9 +429,11 @@
     .wrapper {
       position: relative;
       z-index: 1;
-      padding: 70px 72px 80px;
+      padding: 48px 56px 60px;
+      /* reduced from 70px 72px 80px */
       width: 100%;
-      max-width: 1600px;
+      max-width: 1700px;
+      /* slightly wider to compensate */
       margin: 0 auto;
       box-sizing: border-box;
     }
@@ -438,20 +444,23 @@
     .header {
       display: flex;
       align-items: center;
-      /* was: flex-end */
       justify-content: space-between;
-      margin-bottom: 48px;
-      padding-bottom: 32px;
+      margin-bottom: 28px;
+      /* reduced from 48px */
+      padding-bottom: 20px;
+      /* reduced from 32px */
       border-bottom: 1px solid var(--border);
       animation: slideDown .5s ease both;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 12px;
+      /* reduced from 16px */
       position: relative;
       z-index: 1001;
     }
 
     .header-left h1 {
-      font-size: 2.8rem;
+      font-size: 2.2rem;
+      /* reduced from 2.8rem */
       font-weight: 800;
       letter-spacing: -.5px;
       background: linear-gradient(135deg, var(--accent), var(--accent3));
