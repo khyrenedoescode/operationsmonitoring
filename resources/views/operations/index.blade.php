@@ -3469,7 +3469,6 @@
         <colgroup>
           <col style="width:64px">
           <col style="width:145px">
-          <col style="width:150px">
           <col style="width:220px">
           <col style="width:150px">
           <col style="width:160px">
@@ -3528,7 +3527,7 @@
             <th class="col-sep">
               <div class="subhead"><span class="subhead-dot sd-proposal"></span>Proposal Status</div>
             </th>
-            <th>Proposal Remarks</th>
+            <th class="col-sep">Proposal Remarks</th>
 
             <!-- UI/UX Assigned & Status — NO divider between them, merged feel -->
             <th class="col-sep" style="border-right:none !important;">
@@ -3664,8 +3663,7 @@
             <option>Final Homepage</option>
           </select>
         </div>
-        <div class="form-group"><label>Proposal Assigned</label><input type="text" id="f-prop-assign"
-            placeholder="Name..." /></div>
+
         <div class="form-group"><label>UI/UX Status</label>
           <select id="f-uiux-status">
             <option>On Hold</option>
@@ -3673,11 +3671,24 @@
             <option>Revisions</option>
           </select>
         </div>
-        <div class="form-group"><label>UI/UX Due Date</label><input type="date" id="f-uiux-due" /></div>
-        <div class="form-group"><label>UI/UX Assigned</label><input type="text" id="f-uiux-assign"
-            placeholder="Name..." /></div>
-        <div class="form-group"><label>Dev Assigned</label><input type="text" id="f-dev-assign" placeholder="Name..." />
+        <div class="form-group"><label>UI/UX Assigned</label>
+          <input type="text" id="f-uiux-assign" placeholder="Name..." list="uiux-assignee-list" autocomplete="off" />
         </div>
+        <div class="form-group"><label>Dev Assigned</label>
+          <input type="text" id="f-dev-assign" placeholder="Name..." list="dev-assignee-list" autocomplete="off" />
+        </div>
+        <datalist id="uiux-assignee-list">
+          <option value="Nicolle">
+          <option value="Kent">
+        </datalist>
+        <datalist id="dev-assignee-list">
+          <option value="Anthony">
+          <option value="Adrian">
+          <option value="Ahadon">
+          <option value="Kef">
+          <option value="John Carl">
+        </datalist>
+
         <div class="form-group"><label>Front-end Status</label>
           <select id="f-dev-fe">
             <option value="">—</option>
@@ -4113,6 +4124,9 @@
           return sortDir === 'asc' ? av - bv : bv - av;
         }
         const cmp = String(av).localeCompare(String(bv));
+        if (key === 'client') {
+          return sortDir === 'asc' ? -cmp : cmp;
+        }
         return sortDir === 'asc' ? cmp : -cmp;
       });
       renderTable();
@@ -4228,13 +4242,13 @@
       ];
       let px = 18;
       pills.forEach(p => {
-        const tw = doc.getTextWidth('● ' + p.label) + 7;
+        const tw = doc.getTextWidth(p.label) + 10;
         doc.setFillColor(p.color[0], p.color[1], p.color[2]);
         doc.roundedRect(px, 24.5, tw, 5, 1.5, 1.5, 'F');
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(6.8);
         doc.setTextColor(255, 255, 255);
-        doc.text('● ' + p.label, px + 3.5, 27.8);
+        doc.text(p.label, px + 5, 27.8);
         px += tw + 3;
       });
 
@@ -4311,11 +4325,12 @@
 
         didParseCell(data) {
           // Hide raw text for status and progress cols — we'll draw custom
-          if (data.section === 'body' && (data.column.index === 8)) {
-            data.cell.styles.textColor = [255, 255, 255]; // make invisible, we overdraw
+          if (data.section === 'body' && data.column.index === 6) {
+            data.cell.styles.textColor = [253, 246, 240];
+            data.cell.styles.minCellHeight = 16;
           }
-          // Make FE/BE cols taller to fit bar
-          if (data.section === 'body' && (data.column.index === 6 || data.column.index === 7)) {
+          if (data.section === 'body' && data.column.index === 7) {
+            data.cell.styles.textColor = [253, 246, 240];
             data.cell.styles.minCellHeight = 16;
           }
         },
@@ -4452,12 +4467,11 @@
         ${STAGES.map(s => `<option${r.stage === s ? ' selected' : ''}>${escHtml(s)}</option>`).join('')}
       </select>
     </td>
-    <td>
-      <div class="assignee"><div class="avatar ${avc(r.prop_assign)}" id="pav-${i}">${ini(r.prop_assign)}</div>
-        <span class="assignee-name editable" contenteditable="true" spellcheck="false" onblur="save(${i},'prop_assign',this);rerenderAv('p',${i})" data-placeholder="Name...">${escHtml(r.prop_assign === '—' ? '' : r.prop_assign)}</span>
-      </div>
-      <div class="remark-text editable" contenteditable="true" spellcheck="false" data-placeholder="Add remarks..." onblur="save(${i},'prop_remark',this)">${escHtml(r.prop_remark)}</div>
+    
+    <td class="col-sep">
+     <div class="remark-text editable" contenteditable="true" spellcheck="false" data-placeholder="Add remarks..." onblur="save(${i},'prop_remark',this)">${escHtml(r.prop_remark)}</div>
     </td>
+    
     <td class="col-sep" style="border-right:none !important;">
       <div class="assignee"><div class="avatar ${avc(r.uiux_assign)}" id="uav-${i}">${ini(r.uiux_assign)}</div>
         <span class="assignee-name editable" contenteditable="true" spellcheck="false" onblur="save(${i},'uiux_assign',this);rerenderAv('u',${i})" data-placeholder="Name...">${escHtml(r.uiux_assign === '—' ? '' : r.uiux_assign)}</span>
@@ -4532,8 +4546,28 @@
   </div>
   </td>
     <td class="col-sep">
-      <div class="final-text editable" contenteditable="true" spellcheck="false" data-placeholder="Add final remarks..." onblur="save(${i},'final_remark',this)">${escHtml(r.final_remark)}</div>
-      <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border);">
+  <div class="final-text editable" contenteditable="true" spellcheck="false" data-placeholder="Add final remarks..." onblur="save(${i},'final_remark',this)">${escHtml(r.final_remark)}</div>
+  
+  <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);">
+    <div style="font-size:.6rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Deployment</div>
+    <div style="position:relative;">
+      <select class="stage-select" style="margin-top:0;font-size:.72rem;" onchange="saveVal(${i},'deployment_status',this.value)">
+        <option value=""${!r.deployment_status ? ' selected' : ''}>Select status...</option>
+        <option value="Deployed"${r.deployment_status === 'Deployed' ? ' selected' : ''}>Deployed</option>
+        <option value="Not Deployed"${r.deployment_status === 'Not Deployed' ? ' selected' : ''}>Undeployed</option>
+      </select>
+    </div>
+    ${r.deployment_status ? `
+    <div style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;padding:3px 9px;border-radius:6px;font-size:.68rem;font-weight:600;
+      background:${r.deployment_status === 'Deployed' ? 'rgba(90,154,106,.12)' : 'rgba(176,128,32,.12)'};
+      color:${r.deployment_status === 'Deployed' ? 'var(--done)' : 'var(--onhold)'};
+      border:1px solid ${r.deployment_status === 'Deployed' ? 'rgba(90,154,106,.3)' : 'rgba(176,128,32,.3)'};">
+      <div style="width:6px;height:6px;border-radius:50%;background:${r.deployment_status === 'Deployed' ? 'var(--done)' : 'var(--onhold)'};"></div>
+      ${r.deployment_status === 'Deployed' ? 'Deployed' : 'Not Deployed Yet'}
+    </div>` : ''}
+  </div>
+
+  <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
         <div class="final-header-row">
           <span class="final-tag">Final</span>
           <span class="final-date-str" id="fdate-str-${i}">${finalDateFmt(r.due)}</span>
@@ -4698,17 +4732,21 @@
 
     function save(i, key, el) {
       const val = el.innerText.trim();
-      if (rows[i][key] === val) return; // No change, skip
-      const oldVal = rows[i][key];
-      rows[i][key] = val;
+      const oldVal = rows[i][key] || '';
+      // Normalize — and empty string as the same
+      const normalizedOld = (oldVal === '—' ? '' : oldVal);
+      const normalizedNew = (val === '—' ? '' : val);
+      if (normalizedOld === normalizedNew) return; // No real change, skip
+      rows[i][key] = val || '—';
       ajaxPatch(i, key, val);
-      logActivity('edit', `Edited ${key.replace(/_/g, ' ')} for ${rows[i].client}`, `"${oldVal}" → "${val}"`);
+      logActivity('edit', `Edited ${key.replace(/_/g, ' ')} for ${rows[i].client}`, `"${normalizedOld}" → "${normalizedNew}"`);
       toast('Saved ✓');
       updateCounts();
     }
 
     function saveVal(i, key, val) {
-      const oldVal = rows[i][key];
+      const oldVal = rows[i][key] || '';
+      if (oldVal === val) return; // No change, skip
       rows[i][key] = val;
       ajaxPatch(i, key, val);
       if (key === 'stage') {
@@ -4984,6 +5022,7 @@
             uiux_due: rv.uiux_due ? rv.uiux_due.replace(' 00:00:00', '') : '',
             dev_due: rv.dev_due ? rv.dev_due.replace(' 00:00:00', '') : '',
             final_remark: rv.final_remark || '',
+            deployment_status: rv.deployment_status || '',
             last_edited_by: '',
             last_edited_field: '',
             updated_at: 'just now'
@@ -4998,7 +5037,7 @@
           });
           updateLogBadge();
           setTimeout(() => {
-            const last = document.getElementById('row-' + (rows.length - 1));
+            const last = document.getElementById('row-0');
             if (last) {
               last.classList.add('row-pulse');
               setTimeout(() => last.classList.remove('row-pulse'), 950);
@@ -5143,7 +5182,6 @@
       const payload = {
         client: client,
         stage: document.getElementById('f-stage').value,
-        prop_assign: document.getElementById('f-prop-assign').value.trim() || '—',
         prop_remark: document.getElementById('f-prop-remark').value.trim() || '',
         uiux_status: document.getElementById('f-uiux-status').value,
         uiux_assign: document.getElementById('f-uiux-assign').value.trim() || '—',
@@ -5154,9 +5192,10 @@
         dev_be: document.getElementById('f-dev-be').value || '',
         status: document.getElementById('f-status').value,
         due: document.getElementById('f-due').value || null,
-        uiux_due: document.getElementById('f-uiux-due').value || null,
+        uiux_due: document.getElementById('f-uiux-due') ? document.getElementById('f-uiux-due').value || null : null,
         dev_due: document.getElementById('f-dev-due').value || null,
         final_remark: document.getElementById('f-final-remark').value.trim() || '',
+        deployment_status: document.getElementById('f-deployment-status') ? document.getElementById('f-deployment-status').value : '',
         edited_by: 'User'
       };
 
@@ -5178,7 +5217,7 @@
           const r = data.row;
 
           // 3. Update the local "rows" array so the table updates instantly
-          rows.push({
+          rows.unshift({
             id: r.id,
             client: r.client,
             tag: r.tag,
@@ -5197,6 +5236,7 @@
             uiux_due: r.uiux_due || '',
             dev_due: r.dev_due || '',
             final_remark: r.final_remark || '',
+            deployment_status: r.deployment_status || '',
             last_edited_by: '',
             last_edited_field: '',
             updated_at: 'just now'
@@ -5204,7 +5244,7 @@
 
           // 4. UI Cleanup
           closeModal();
-          ['f-client', 'f-prop-assign', 'f-uiux-assign', 'f-uiux-due',
+          ['f-client', 'f-uiux-assign', 'f-uiux-due',
             'f-dev-assign', 'f-dev-due', 'f-fe', 'f-be', 'f-due',
             'f-prop-remark', 'f-final-remark'
           ]
@@ -5217,7 +5257,7 @@
           renderTable();
 
           setTimeout(() => {
-            const last = document.getElementById('row-' + (rows.length - 1));
+            const last = document.getElementById('row-0');
             if (last) {
               last.classList.add('row-pulse');
               setTimeout(() => last.classList.remove('row-pulse'), 950);
@@ -5656,6 +5696,7 @@
             uiux_due: rv.uiux_due ? rv.uiux_due.replace(' 00:00:00', '') : '',
             dev_due: rv.dev_due ? rv.dev_due.replace(' 00:00:00', '') : '',
             final_remark: rv.final_remark || '',
+            deployment_status: rv.deployment_status || '',
             last_edited_by: '',
             last_edited_field: '',
             updated_at: 'just now'

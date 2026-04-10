@@ -29,6 +29,7 @@ class Operation extends Model
         'status',
         'due',
         'final_remark',
+        'deployment_status',
         'last_edited_by',
         'last_edited_field',
         'deleted_at',

@@ -51,6 +51,7 @@ class OperationController extends Controller
             'dev_due' => 'nullable|date',
             'due' => 'nullable|date',
             'final_remark' => 'nullable|string',
+            'deployment_status' => 'nullable|string',
         ]);
 
         $data['prop_assign'] = !empty($data['prop_assign']) ? $data['prop_assign'] : '—';
@@ -76,9 +77,9 @@ class OperationController extends Controller
         ]);
 
         $responseRow = $op->toArray();
-        $responseRow['due'] = $op->due ? $op->due->format('Y-m-d') : null;
-        $responseRow['uiux_due'] = $op->uiux_due ? $op->uiux_due->format('Y-m-d') : null;
-        $responseRow['dev_due'] = $op->dev_due ? $op->dev_due->format('Y-m-d') : null;
+        $responseRow['due'] = $op->getRawOriginal('due');
+        $responseRow['uiux_due'] = $op->getRawOriginal('uiux_due');
+        $responseRow['dev_due'] = $op->getRawOriginal('dev_due');
 
         if ($request->expectsJson()) {
             return response()->json(['success' => true, 'row' => $responseRow]);
@@ -108,6 +109,7 @@ class OperationController extends Controller
             'status',
             'due',
             'final_remark',
+            'deployment_status',
         ];
 
         $field = $request->input('field');
@@ -236,9 +238,9 @@ class OperationController extends Controller
         ]);
 
         $responseRow = $operation->toArray();
-        $responseRow['due'] = $operation->due ? $operation->due->format('Y-m-d') : null;
-        $responseRow['uiux_due'] = $operation->uiux_due ? $operation->uiux_due->format('Y-m-d') : null;
-        $responseRow['dev_due'] = $operation->dev_due ? $operation->dev_due->format('Y-m-d') : null;
+        $responseRow['due'] = $operation->getRawOriginal('due');
+        $responseRow['uiux_due'] = $operation->getRawOriginal('uiux_due');
+        $responseRow['dev_due'] = $operation->getRawOriginal('dev_due');
 
         return response()->json(['success' => true, 'row' => $responseRow]);
     }
