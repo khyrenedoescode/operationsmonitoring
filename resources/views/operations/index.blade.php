@@ -4342,19 +4342,21 @@
           if (data.column.index === 6) {
             const val = parseInt(data.cell.raw) || 0;
             const barW = width - 10, barH = 3;
-            const bx = x + 5, by = y + height - 7;
+            const bx = x + 5;
+            const labelY = y + (height / 2) - 3;
+            const barY = y + (height / 2) + 3;
             // Label
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(8);
             doc.setTextColor(61, 43, 34);
-            doc.text(`${val}%`, x + width / 2, y + height / 2 - 1, { align: 'center', baseline: 'middle' });
+            doc.text(`${val}%`, x + width / 2, labelY, { align: 'center', baseline: 'middle' });
             // Track
             doc.setFillColor(232, 213, 196);
-            doc.roundedRect(bx, by, barW, barH, 1, 1, 'F');
+            doc.roundedRect(bx, barY, barW, barH, 1, 1, 'F');
             // Fill
             if (val > 0) {
               doc.setFillColor(201, 99, 122);
-              doc.roundedRect(bx, by, (barW * val) / 100, barH, 1, 1, 'F');
+              doc.roundedRect(bx, barY, (barW * val) / 100, barH, 1, 1, 'F');
             }
           }
 
@@ -4362,19 +4364,21 @@
           if (data.column.index === 7) {
             const val = parseInt(data.cell.raw) || 0;
             const barW = width - 10, barH = 3;
-            const bx = x + 5, by = y + height - 7;
+            const bx = x + 5;
+            const labelY = y + (height / 2) - 3;
+            const barY = y + (height / 2) + 3;
             // Label
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(8);
             doc.setTextColor(61, 43, 34);
-            doc.text(`${val}%`, x + width / 2, y + height / 2 - 1, { align: 'center', baseline: 'middle' });
+            doc.text(`${val}%`, x + width / 2, labelY, { align: 'center', baseline: 'middle' });
             // Track
             doc.setFillColor(232, 213, 196);
-            doc.roundedRect(bx, by, barW, barH, 1, 1, 'F');
+            doc.roundedRect(bx, barY, barW, barH, 1, 1, 'F');
             // Fill
             if (val > 0) {
               doc.setFillColor(176, 112, 96);
-              doc.roundedRect(bx, by, (barW * val) / 100, barH, 1, 1, 'F');
+              doc.roundedRect(bx, barY, (barW * val) / 100, barH, 1, 1, 'F');
             }
           }
 
