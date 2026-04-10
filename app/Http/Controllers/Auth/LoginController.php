@@ -18,7 +18,7 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email'    => 'required|email',
+            'email' => 'required|email',
             'password' => 'required',
         ]);
 
@@ -34,14 +34,15 @@ class LoginController extends Controller
     {
         $request->validate([
             'first_name' => 'required|string|max:100',
-            'last_name'  => 'required|string|max:100',
-            'email'      => 'required|email|unique:users,email',
-            'password'   => 'required|min:8|confirmed',
+            'last_name' => 'required|string|max:100',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:8|confirmed',
+            'password_confirmation' => 'required',  // ← dagdag ito
         ]);
 
         User::create([
-            'name'     => $request->first_name . ' ' . $request->last_name,
-            'email'    => $request->email,
+            'name' => $request->first_name . ' ' . $request->last_name,
+            'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
 
