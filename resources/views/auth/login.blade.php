@@ -200,7 +200,7 @@ body::before{
         <div class="field-error">Password is required.</div>
       </div>
 
-      <div class="forgot"><a href="#">Forgot password?</a></div>
+      <div class="forgot"><a href="{{ route('password.request') }}">Forgot password?</a></div>
 
       <button class="btn-submit" id="btn-login" onclick="doLogin()">
         <span class="btn-text">Sign In</span>
@@ -230,7 +230,7 @@ body::before{
           <label>First Name</label>
           <div class="input-wrap">
             <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <input type="text" id="r-fname" placeholder="Juan" autocomplete="given-name" />
+            <input type="text" id="r-fname" placeholder="First Name" autocomplete="given-name" />
           </div>
           <div class="field-error">Required.</div>
         </div>
@@ -238,7 +238,7 @@ body::before{
           <label>Last Name</label>
           <div class="input-wrap">
             <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <input type="text" id="r-lname" placeholder="dela Cruz" autocomplete="family-name" />
+            <input type="text" id="r-lname" placeholder="Last Name" autocomplete="family-name" />
           </div>
           <div class="field-error">Required.</div>
         </div>
