@@ -3482,7 +3482,8 @@
         <thead>
           <tr>
             <!-- FIX: Delete column header background matched to adjacent boxes -->
-            <th style="background:var(--surface2);border-bottom:1px solid var(--border);border-right:1px solid var(--border);">
+            <th
+              style="background:var(--surface2);border-bottom:1px solid var(--border);border-right:1px solid var(--border);">
               <div class="delete-th-inner">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                   stroke-linejoin="round">
@@ -3494,7 +3495,8 @@
                 <span class="delete-th-label">Delete</span>
               </div>
             </th>
-            <th style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--border);color:var(--muted2);">
+            <th
+              style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--border);color:var(--muted2);">
             </th>
             <th colspan="2" class="group-proposal col-sep"
               style="background:var(--surface2);padding:9px 14px 6px;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--border);">
@@ -3572,7 +3574,8 @@
   <div class="archive-drawer" id="archive-drawer">
     <div class="archive-drawer-header">
       <div class="archive-drawer-title">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
           <polyline points="21 8 21 21 3 21 3 8" />
           <rect x="1" y="3" width="22" height="5" />
           <line x1="10" y1="12" x2="14" y2="12" />
@@ -3721,10 +3724,12 @@
     <div class="confirm-box">
       <span class="bin-icon">🗂️</span>
       <h3>Move to Archive?</h3>
-      <p>This will archive <strong id="confirm-archive-name"></strong>.<br>You can restore it anytime from the Archive.</p>
+      <p>This will archive <strong id="confirm-archive-name"></strong>.<br>You can restore it anytime from the Archive.
+      </p>
       <div class="confirm-actions">
         <button class="btn-confirm-cancel" onclick="closeArchiveConfirm()">Cancel</button>
-        <button class="btn-confirm-delete" style="background:linear-gradient(135deg,var(--archive),#5a4aaf);" onclick="confirmArchive()">Move to Archive</button>
+        <button class="btn-confirm-delete" style="background:linear-gradient(135deg,var(--archive),#5a4aaf);"
+          onclick="confirmArchive()">Move to Archive</button>
       </div>
     </div>
   </div>
@@ -3917,7 +3922,7 @@
         Done: 's-done',
         'On Hold': 's-onhold',
         Revisions: 's-revision'
-      } [s] || 's-onhold';
+      }[s] || 's-onhold';
     }
 
     function uiuxBadgeHtml(s, idx) {
@@ -4163,18 +4168,12 @@
       }, 400);
     }
 
-    async function exportPDF() {
+    async function async function exportPDF() {
       document.getElementById('export-dropdown').classList.remove('open');
       showLoading('Generating PDF…');
 
-      const {
-        jsPDF
-      } = window.jspdf;
-      const doc = new jsPDF({
-        orientation: 'landscape',
-        unit: 'mm',
-        format: 'a4'
-      });
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
 
       const visible = rows.filter((_, i) => {
         const tr = document.getElementById('row-' + i);
@@ -4184,83 +4183,65 @@
       const pageW = doc.internal.pageSize.getWidth();
       const pageH = doc.internal.pageSize.getHeight();
 
-      // ── Soft pink background
+      // ── Background
       doc.setFillColor(253, 246, 240);
       doc.rect(0, 0, pageW, pageH, 'F');
 
-      // ── Top accent bar gradient simulation
+      // ── Top accent bar
       doc.setFillColor(201, 99, 122);
       doc.rect(0, 0, pageW, 1.2, 'F');
 
       // ── Header section background
       doc.setFillColor(255, 248, 245);
-      doc.roundedRect(10, 6, pageW - 20, 22, 3, 3, 'F');
+      doc.roundedRect(10, 6, pageW - 20, 24, 3, 3, 'F');
 
-      // ── Logo / Title
+      // ── Title
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(18);
+      doc.setFontSize(20);
       doc.setTextColor(201, 99, 122);
       doc.text('Operations Monitoring', 18, 16);
 
       // ── Subtitle
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7.5);
+      doc.setFontSize(8);
       doc.setTextColor(160, 128, 112);
-      doc.text('Web Development Pipeline', 18, 21.5);
+      doc.text('Web Development Pipeline', 18, 22);
 
       // ── Meta info (right side)
       const now = new Date();
-      const dateStr = now.toLocaleDateString('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric'
-      });
+      const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7);
+      doc.setFontSize(7.5);
       doc.setTextColor(160, 128, 112);
-      doc.text(`Exported: ${dateStr}`, pageW - 18, 14, {
-        align: 'right'
-      });
-      doc.text(`${visible.length} record${visible.length !== 1 ? 's' : ''}`, pageW - 18, 19, {
-        align: 'right'
-      });
+      doc.text(`Exported: ${dateStr}`, pageW - 18, 13, { align: 'right' });
+      doc.text(`${visible.length} record${visible.length !== 1 ? 's' : ''}`, pageW - 18, 19, { align: 'right' });
 
-      // ── Summary pills (Done / On Hold / Revisions counts)
+      // ── Summary pills
       const doneCount = visible.filter(r => r.status === 'Done').length;
       const holdCount = visible.filter(r => r.status === 'On Hold').length;
       const revCount = visible.filter(r => r.status === 'Revisions').length;
 
-      const pills = [{
-          label: `● Done  ${doneCount}`,
-          color: [90, 154, 106]
-        },
-        {
-          label: `● On Hold  ${holdCount}`,
-          color: [176, 128, 32]
-        },
-        {
-          label: `● Revisions  ${revCount}`,
-          color: [201, 96, 112]
-        },
+      const pills = [
+        { label: `Done  ${doneCount}`, color: [90, 154, 106] },
+        { label: `On Hold  ${holdCount}`, color: [176, 128, 32] },
+        { label: `Revisions  ${revCount}`, color: [201, 96, 112] },
       ];
       let px = 18;
       pills.forEach(p => {
-        doc.setFillColor(p.color[0], p.color[1], p.color[2], 0.1);
-        doc.setDrawColor(p.color[0], p.color[1], p.color[2]);
-        doc.setLineWidth(0.3);
-        const tw = doc.getTextWidth(p.label) + 6;
-        doc.roundedRect(px, 23.5, tw, 4.5, 1.2, 1.2, 'FD');
+        const tw = doc.getTextWidth('● ' + p.label) + 7;
+        doc.setFillColor(p.color[0], p.color[1], p.color[2]);
+        doc.roundedRect(px, 24.5, tw, 5, 1.5, 1.5, 'F');
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(6.5);
-        doc.setTextColor(...p.color);
-        doc.text(p.label, px + 3, 26.6);
-        px += tw + 4;
+        doc.setFontSize(6.8);
+        doc.setTextColor(255, 255, 255);
+        doc.text('● ' + p.label, px + 3.5, 27.8);
+        px += tw + 3;
       });
 
       // ── Divider
       doc.setDrawColor(232, 213, 196);
       doc.setLineWidth(0.4);
-      doc.line(10, 30, pageW - 10, 30);
+      doc.line(10, 32, pageW - 10, 32);
 
       // ── Status color helper
       const statusColor = s => {
@@ -4270,12 +4251,10 @@
         return [160, 128, 112];
       };
 
-      const head = [
-        [
-          'Client', 'Stage', 'Proposal', 'UI/UX Assigned', 'UI/UX Status',
-          'Dev Assigned', 'FE%', 'BE%', 'Status', 'Due Date'
-        ]
-      ];
+      const head = [[
+        'Client', 'Stage', 'Proposal', 'UI/UX Assigned', 'UI/UX Status',
+        'Dev Assigned', 'FE %', 'BE %', 'Status', 'Due Date'
+      ]];
 
       const body = visible.map(r => [
         r.client + (r.tag ? `\n${r.tag}` : ''),
@@ -4284,33 +4263,23 @@
         r.uiux_assign || '—',
         r.uiux_status || '',
         r.dev_assign || '—',
-        (r.fe || 0) + '%',
-        (r.be || 0) + '%',
+        `${r.fe || 0}%`,
+        `${r.be || 0}%`,
         r.status || '',
-        r.due ? new Date(r.due + 'T00:00:00').toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric'
-        }) : '—'
+        r.due
+          ? new Date(r.due + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+          : '—'
       ]);
 
       doc.autoTable({
         head,
         body,
-        startY: 33,
-        margin: {
-          left: 10,
-          right: 10
-        },
+        startY: 35,
+        margin: { left: 10, right: 10 },
         styles: {
           font: 'helvetica',
-          fontSize: 7.8,
-          cellPadding: {
-            top: 4,
-            bottom: 4,
-            left: 4,
-            right: 4
-          },
+          fontSize: 8,
+          cellPadding: { top: 5, bottom: 5, left: 5, right: 5 },
           valign: 'middle',
           overflow: 'linebreak',
           textColor: [61, 43, 34],
@@ -4321,130 +4290,102 @@
           fillColor: [242, 230, 213],
           textColor: [122, 92, 80],
           fontStyle: 'bold',
-          fontSize: 7,
-          cellPadding: {
-            top: 5,
-            bottom: 5,
-            left: 4,
-            right: 4
-          },
+          fontSize: 7.5,
+          cellPadding: { top: 6, bottom: 6, left: 5, right: 5 },
+          halign: 'center',
         },
         columnStyles: {
-          0: {
-            cellWidth: 30
-          },
-          1: {
-            cellWidth: 28
-          },
-          2: {
-            cellWidth: 22
-          },
-          3: {
-            cellWidth: 28
-          },
-          4: {
-            cellWidth: 22
-          },
-          5: {
-            cellWidth: 26
-          },
-          6: {
-            cellWidth: 10,
-            halign: 'center'
-          },
-          7: {
-            cellWidth: 10,
-            halign: 'center'
-          },
-          8: {
-            cellWidth: 24,
-            halign: 'center'
-          },
-          9: {
-            cellWidth: 26,
-            halign: 'center'
-          },
+          0: { cellWidth: 32, halign: 'left' },
+          1: { cellWidth: 30, halign: 'center' },
+          2: { cellWidth: 22, halign: 'center' },
+          3: { cellWidth: 28, halign: 'center' },
+          4: { cellWidth: 24, halign: 'center' },
+          5: { cellWidth: 26, halign: 'center' },
+          6: { cellWidth: 18, halign: 'center' },
+          7: { cellWidth: 18, halign: 'center' },
+          8: { cellWidth: 24, halign: 'center' },
+          9: { cellWidth: 28, halign: 'center' },
         },
-        alternateRowStyles: {
-          fillColor: [255, 252, 250]
-        },
+        alternateRowStyles: { fillColor: [255, 252, 250] },
         rowPageBreak: 'avoid',
 
+        didParseCell(data) {
+          // Hide raw text for status and progress cols — we'll draw custom
+          if (data.section === 'body' && (data.column.index === 8)) {
+            data.cell.styles.textColor = [255, 255, 255]; // make invisible, we overdraw
+          }
+          // Make FE/BE cols taller to fit bar
+          if (data.section === 'body' && (data.column.index === 6 || data.column.index === 7)) {
+            data.cell.styles.minCellHeight = 16;
+          }
+        },
+
         didDrawCell(data) {
-          // ── Styled status badge
-          if (data.section === 'body' && data.column.index === 8) {
+          if (data.section !== 'body') return;
+          const { x, y, width, height } = data.cell;
+
+          // ── Status badge (col 8)
+          if (data.column.index === 8) {
             const val = data.cell.raw;
             const [r, g, b] = statusColor(val);
-            const {
-              x,
-              y,
-              width,
-              height
-            } = data.cell;
-            const bw = Math.min(width - 4, 20),
-              bh = 5.5;
-            const bx = x + (width - bw) / 2,
-              by = y + (height - bh) / 2;
-
-            // Badge background
+            const bw = Math.min(width - 6, 22), bh = 6;
+            const bx = x + (width - bw) / 2, by = y + (height - bh) / 2;
             doc.setFillColor(r, g, b);
-            doc.roundedRect(bx, by, bw, bh, 1.5, 1.5, 'F');
-
-            // Badge text
+            doc.roundedRect(bx, by, bw, bh, 1.8, 1.8, 'F');
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(6.5);
             doc.setTextColor(255, 255, 255);
-            doc.text(val, bx + bw / 2, by + bh / 2 + 0.5, {
-              align: 'center',
-              baseline: 'middle'
-            });
+            doc.text(val, bx + bw / 2, by + bh / 2 + 0.5, { align: 'center', baseline: 'middle' });
           }
 
-          // ── Progress bar for FE% and BE%
-          if (data.section === 'body' && (data.column.index === 6 || data.column.index === 7)) {
+          // ── FE% progress (col 6)
+          if (data.column.index === 6) {
             const val = parseInt(data.cell.raw) || 0;
-            const {
-              x,
-              y,
-              width,
-              height
-            } = data.cell;
-            const barW = width - 6,
-              barH = 2.5;
-            const bx = x + 3,
-              by = y + height - 5;
-
+            const barW = width - 10, barH = 3;
+            const bx = x + 5, by = y + height - 7;
+            // Label
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8);
+            doc.setTextColor(61, 43, 34);
+            doc.text(`${val}%`, x + width / 2, y + height / 2 - 1, { align: 'center', baseline: 'middle' });
             // Track
             doc.setFillColor(232, 213, 196);
-            doc.roundedRect(bx, by, barW, barH, 0.8, 0.8, 'F');
-
+            doc.roundedRect(bx, by, barW, barH, 1, 1, 'F');
             // Fill
             if (val > 0) {
               doc.setFillColor(201, 99, 122);
-              doc.roundedRect(bx, by, (barW * val) / 100, barH, 0.8, 0.8, 'F');
+              doc.roundedRect(bx, by, (barW * val) / 100, barH, 1, 1, 'F');
             }
           }
 
-          // ── UI/UX status dot
-          if (data.section === 'body' && data.column.index === 4) {
+          // ── BE% progress (col 7)
+          if (data.column.index === 7) {
+            const val = parseInt(data.cell.raw) || 0;
+            const barW = width - 10, barH = 3;
+            const bx = x + 5, by = y + height - 7;
+            // Label
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8);
+            doc.setTextColor(61, 43, 34);
+            doc.text(`${val}%`, x + width / 2, y + height / 2 - 1, { align: 'center', baseline: 'middle' });
+            // Track
+            doc.setFillColor(232, 213, 196);
+            doc.roundedRect(bx, by, barW, barH, 1, 1, 'F');
+            // Fill
+            if (val > 0) {
+              doc.setFillColor(176, 112, 96);
+              doc.roundedRect(bx, by, (barW * val) / 100, barH, 1, 1, 'F');
+            }
+          }
+
+          // ── UI/UX Status dot (col 4)
+          if (data.column.index === 4) {
             const val = data.cell.raw;
             const [r, g, b] = statusColor(val);
-            const {
-              x,
-              y,
-              height
-            } = data.cell;
             doc.setFillColor(r, g, b);
-            doc.circle(x + 4, y + height / 2, 1.2, 'F');
+            doc.circle(x + 6, y + height / 2, 1.5, 'F');
           }
         },
-
-        didParseCell(data) {
-          if (data.section === 'body' && data.column.index === 8) {
-            data.cell.styles.textColor = [255, 255, 255];
-            data.cell.styles.fillColor = [255, 255, 255];
-          }
-        }
       });
 
       // ── Footer
@@ -4456,9 +4397,7 @@
       doc.setFontSize(6.5);
       doc.setTextColor(160, 128, 112);
       doc.text('Operations Monitoring · Web Development Pipeline', 10, finalY + 4);
-      doc.text(`Page 1`, pageW - 10, finalY + 4, {
-        align: 'right'
-      });
+      doc.text('Page 1', pageW - 10, finalY + 4, { align: 'right' });
 
       hideLoading();
       logActivity('edit', 'Exported PDF', `${visible.length} records exported`);
@@ -5265,10 +5204,10 @@
             'f-dev-assign', 'f-dev-due', 'f-fe', 'f-be', 'f-due',
             'f-prop-remark', 'f-final-remark'
           ]
-          .forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = '';
-          });
+            .forEach(id => {
+              const el = document.getElementById(id);
+              if (el) el.value = '';
+            });
 
           // 5. Re-draw the table and show animations
           renderTable();
@@ -5363,17 +5302,17 @@
       const overdueMap = {};
       rows.forEach(r => {
         const checks = [{
-            label: 'Final Due',
-            date: r.due
-          },
-          {
-            label: 'UI/UX Due',
-            date: r.uiux_due
-          },
-          {
-            label: 'Dev Due',
-            date: r.dev_due
-          },
+          label: 'Final Due',
+          date: r.due
+        },
+        {
+          label: 'UI/UX Due',
+          date: r.uiux_due
+        },
+        {
+          label: 'Dev Due',
+          date: r.dev_due
+        },
         ];
         checks.forEach(c => {
           if (!c.date) return;
@@ -5751,7 +5690,7 @@
     setTimeout(checkOverdueOnLoad, 800); // slight delay so table renders first
 
     /* ════ DRAG TO SCROLL TABLE ════ */
-    (function() {
+    (function () {
       const wrap = document.querySelector('.table-wrap');
       let isDown = false,
         startX, scrollLeft;
