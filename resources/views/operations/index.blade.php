@@ -3720,6 +3720,13 @@
             placeholder="0–100" /></div>
         <div class="form-group full"><label>Proposal Remarks</label><textarea id="f-prop-remark" rows="2"
             placeholder="Notes about this proposal..."></textarea></div>
+        <div class="form-group"><label>Deployment Status</label>
+          <select id="f-deployment-status">
+            <option value="">— Not Set —</option>
+            <option value="Deployed">Deployed</option>
+            <option value="Not Deployed">Not Deployed</option>
+          </select>
+        </div>
         <div class="form-group full"><label>Final Remarks</label><textarea id="f-final-remark" rows="2"
             placeholder="Closing notes, delivery status..."></textarea></div>
       </div>
@@ -5246,7 +5253,7 @@
           closeModal();
           ['f-client', 'f-uiux-assign', 'f-uiux-due',
             'f-dev-assign', 'f-dev-due', 'f-fe', 'f-be', 'f-due',
-            'f-prop-remark', 'f-final-remark'
+            'f-prop-remark', 'f-final-remark', 'f-deployment-status'
           ]
             .forEach(id => {
               const el = document.getElementById(id);
