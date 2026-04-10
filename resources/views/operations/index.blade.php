@@ -775,6 +775,11 @@
       height: 14px;
     }
 
+    .logout-btn:hover {
+      border-color: var(--revision) !important;
+      color: var(--revision) !important;
+    }
+
     /* ══════════════════════════════════════════════
    SEARCH & FILTER BAR
 ══════════════════════════════════════════════ */
@@ -3399,6 +3404,21 @@
           <span class="recycle-badge hidden" id="bin-badge">0</span>
         </button>
 
+        <!-- Logout -->
+        <form method="POST" action="{{ route('logout') }}" style="display:inline;">
+          @csrf
+          <button type="submit" class="recycle-btn"
+            style="border-color:var(--border);animation:popIn .5s ease .09s both;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            <span>{{ Auth::user()->name }}</span>
+          </button>
+        </form>
+
         <!-- Theme Toggle -->
         <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
           <div class="toggle-icons">
@@ -4204,67 +4224,6 @@
       const pageW = doc.internal.pageSize.getWidth();
       const pageH = doc.internal.pageSize.getHeight();
 
-      // ── Background
-      doc.setFillColor(253, 246, 240);
-      doc.rect(0, 0, pageW, pageH, 'F');
-
-      // ── Top accent bar
-      doc.setFillColor(201, 99, 122);
-      doc.rect(0, 0, pageW, 1.2, 'F');
-
-      // ── Header section background
-      doc.setFillColor(255, 248, 245);
-      doc.roundedRect(10, 6, pageW - 20, 24, 3, 3, 'F');
-
-      // ── Title
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(20);
-      doc.setTextColor(201, 99, 122);
-      doc.text('Operations Monitoring', 18, 16);
-
-      // ── Subtitle
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
-      doc.setTextColor(160, 128, 112);
-      doc.text('Web Development Pipeline', 18, 22);
-
-      // ── Meta info (right side)
-      const now = new Date();
-      const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7.5);
-      doc.setTextColor(160, 128, 112);
-      doc.text(`Exported: ${dateStr}`, pageW - 18, 13, { align: 'right' });
-      doc.text(`${visible.length} record${visible.length !== 1 ? 's' : ''}`, pageW - 18, 19, { align: 'right' });
-
-      // ── Summary pills
-      const doneCount = visible.filter(r => r.status === 'Done').length;
-      const holdCount = visible.filter(r => r.status === 'On Hold').length;
-      const revCount = visible.filter(r => r.status === 'Revisions').length;
-
-      const pills = [
-        { label: `Done  ${doneCount}`, color: [90, 154, 106] },
-        { label: `On Hold  ${holdCount}`, color: [176, 128, 32] },
-        { label: `Revisions  ${revCount}`, color: [201, 96, 112] },
-      ];
-      let px = 18;
-      pills.forEach(p => {
-        const tw = doc.getTextWidth(p.label) + 10;
-        doc.setFillColor(p.color[0], p.color[1], p.color[2]);
-        doc.roundedRect(px, 24.5, tw, 5, 1.5, 1.5, 'F');
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(6.8);
-        doc.setTextColor(255, 255, 255);
-        doc.text(p.label, px + 5, 27.8);
-        px += tw + 3;
-      });
-
-      // ── Divider
-      doc.setDrawColor(232, 213, 196);
-      doc.setLineWidth(0.4);
-      doc.line(10, 32, pageW - 10, 32);
-
-      // ── Status color helper
       const statusColor = s => {
         if (s === 'Done') return [90, 154, 106];
         if (s === 'On Hold') return [176, 128, 32];
@@ -4272,73 +4231,173 @@
         return [160, 128, 112];
       };
 
+      const deployColor = s => {
+        if (s === 'Deployed') return [90, 154, 106];
+        if (s === 'Not Deployed') return [176, 128, 32];
+        return [160, 128, 112];
+      };
+
+      const drawPage = (pageRows, pageNum, totalPages) => {
+        // Background
+        doc.setFillColor(253, 246, 240);
+        doc.rect(0, 0, pageW, pageH, 'F');
+
+        // Top accent bar
+        doc.setFillColor(201, 99, 122);
+        doc.rect(0, 0, pageW, 1.2, 'F');
+
+        // Header bg
+        doc.setFillColor(255, 248, 245);
+        doc.roundedRect(10, 5, pageW - 20, 22, 3, 3, 'F');
+
+        // Title
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.setTextColor(201, 99, 122);
+        doc.text('Operations Monitoring', 16, 13);
+
+        // Subtitle
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7);
+        doc.setTextColor(160, 128, 112);
+        doc.text('Web Development Pipeline', 16, 19);
+
+        // Right side meta
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        doc.setFontSize(7);
+        doc.text(`Exported: ${dateStr}`, pageW - 14, 11, { align: 'right' });
+        doc.text(`${visible.length} record${visible.length !== 1 ? 's' : ''} · Page ${pageNum} of ${totalPages}`, pageW - 14, 17, { align: 'right' });
+
+        // Summary pills (only on page 1)
+        if (pageNum === 1) {
+          const doneCount = visible.filter(r => r.status === 'Done').length;
+          const holdCount = visible.filter(r => r.status === 'On Hold').length;
+          const revCount = visible.filter(r => r.status === 'Revisions').length;
+          const pills = [
+            { label: `Done  ${doneCount}`, color: [90, 154, 106] },
+            { label: `On Hold  ${holdCount}`, color: [176, 128, 32] },
+            { label: `Revisions  ${revCount}`, color: [201, 96, 112] },
+          ];
+          let px = 16;
+          doc.setFontSize(6.5);
+          pills.forEach(p => {
+            const tw = doc.getTextWidth(p.label) + 8;
+            doc.setFillColor(...p.color);
+            doc.roundedRect(px, 23, tw, 4.5, 1.2, 1.2, 'F');
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(255, 255, 255);
+            doc.text(p.label, px + 4, 26.2);
+            px += tw + 2.5;
+          });
+        }
+
+        // Divider
+        doc.setDrawColor(232, 213, 196);
+        doc.setLineWidth(0.3);
+        doc.line(10, 30, pageW - 10, 30);
+      };
+
+      // Build table data
       const head = [[
-        'Client', 'Stage', 'Proposal', 'UI/UX Assigned', 'UI/UX Status',
-        'Dev Assigned', 'FE %', 'BE %', 'Status', 'Due Date'
+        'Client', 'Stage', 'Proposal Remarks',
+        'UI/UX', 'UI/UX Due',
+        'Dev', 'FE%', 'BE%', 'Dev Status', 'Dev Due',
+        'Status', 'Deploy', 'Final Due', 'Final Remarks'
       ]];
 
-      const body = visible.map(r => [
-        r.client + (r.tag ? `\n${r.tag}` : ''),
-        r.stage || '',
-        r.prop_assign || '—',
-        r.uiux_assign || '—',
-        r.uiux_status || '',
-        r.dev_assign || '—',
-        `${r.fe || 0}%`,
-        `${r.be || 0}%`,
-        r.status || '',
-        r.due
-          ? new Date(r.due + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-          : '—'
-      ]);
+      const body = visible.map(r => {
+        const fmtDate = d => d ? new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+        return [
+          (r.client || '') + (r.tag ? `\n${r.tag}` : ''),
+          r.stage || '',
+          r.prop_remark || '',
+          (r.uiux_assign && r.uiux_assign !== '—' ? r.uiux_assign : '—') + '\n' + (r.uiux_status || ''),
+          fmtDate(r.uiux_due),
+          (r.dev_assign && r.dev_assign !== '—' ? r.dev_assign : '—'),
+          `${r.fe || 0}%`,
+          `${r.be || 0}%`,
+          (r.dev_fe || '—') + ' / ' + (r.dev_be || '—'),
+          fmtDate(r.dev_due),
+          r.status || '',
+          r.deployment_status || '—',
+          fmtDate(r.due),
+          r.final_remark || ''
+        ];
+      });
+
+      // Detect page count (rough estimate to pre-label pages)
+      let pageNum = 1;
+      let totalPages = 1; // jsPDF doesn't pre-calculate, so we patch post-render
+
+      drawPage(body, 1, '?');
 
       doc.autoTable({
         head,
         body,
-        startY: 35,
-        margin: { left: 10, right: 10 },
+        startY: 33,
+        margin: { left: 8, right: 8 },
+        tableWidth: 'auto',
         styles: {
           font: 'helvetica',
-          fontSize: 8,
-          cellPadding: { top: 5, bottom: 5, left: 5, right: 5 },
+          fontSize: 7,
+          cellPadding: { top: 3.5, bottom: 3.5, left: 3, right: 3 },
           valign: 'middle',
           overflow: 'linebreak',
           textColor: [61, 43, 34],
           lineColor: [232, 213, 196],
-          lineWidth: 0.25,
+          lineWidth: 0.2,
+          minCellHeight: 12,
         },
         headStyles: {
           fillColor: [242, 230, 213],
           textColor: [122, 92, 80],
           fontStyle: 'bold',
-          fontSize: 7.5,
-          cellPadding: { top: 6, bottom: 6, left: 5, right: 5 },
+          fontSize: 6.5,
+          cellPadding: { top: 4, bottom: 4, left: 3, right: 3 },
           halign: 'center',
         },
         columnStyles: {
-          0: { cellWidth: 32, halign: 'left' },
-          1: { cellWidth: 30, halign: 'center' },
-          2: { cellWidth: 22, halign: 'center' },
-          3: { cellWidth: 28, halign: 'center' },
-          4: { cellWidth: 24, halign: 'center' },
-          5: { cellWidth: 26, halign: 'center' },
-          6: { cellWidth: 18, halign: 'center' },
-          7: { cellWidth: 18, halign: 'center' },
-          8: { cellWidth: 24, halign: 'center' },
-          9: { cellWidth: 28, halign: 'center' },
+          0: { cellWidth: 22, halign: 'left' },    // Client
+          1: { cellWidth: 18, halign: 'center' },   // Stage
+          2: { cellWidth: 24, halign: 'left' },     // Proposal Remarks
+          3: { cellWidth: 22, halign: 'center' },   // UI/UX
+          4: { cellWidth: 18, halign: 'center' },   // UI/UX Due
+          5: { cellWidth: 18, halign: 'center' },   // Dev
+          6: { cellWidth: 12, halign: 'center' },   // FE%
+          7: { cellWidth: 12, halign: 'center' },   // BE%
+          8: { cellWidth: 22, halign: 'center' },   // Dev Status
+          9: { cellWidth: 18, halign: 'center' },   // Dev Due
+          10: { cellWidth: 18, halign: 'center' },   // Status
+          11: { cellWidth: 18, halign: 'center' },   // Deploy
+          12: { cellWidth: 18, halign: 'center' },   // Final Due
+          13: { cellWidth: 'auto', halign: 'left' }, // Final Remarks
         },
         alternateRowStyles: { fillColor: [255, 252, 250] },
         rowPageBreak: 'avoid',
 
-        didParseCell(data) {
-          // Hide raw text for status and progress cols — we'll draw custom
-          if (data.section === 'body' && data.column.index === 6) {
-            data.cell.styles.textColor = [253, 246, 240];
-            data.cell.styles.minCellHeight = 16;
+        // Draw header on every new page
+        didDrawPage(data) {
+          pageNum = data.pageNumber;
+          if (pageNum > 1) {
+            drawPage([], pageNum, '?');
           }
-          if (data.section === 'body' && data.column.index === 7) {
+          // Footer line
+          doc.setDrawColor(232, 213, 196);
+          doc.setLineWidth(0.25);
+          doc.line(8, pageH - 7, pageW - 8, pageH - 7);
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(6);
+          doc.setTextColor(160, 128, 112);
+          doc.text('Operations Monitoring · Web Development Pipeline', 8, pageH - 4);
+          doc.text(`Page ${pageNum}`, pageW - 8, pageH - 4, { align: 'right' });
+        },
+
+        didParseCell(data) {
+          // Hide raw text for progress % cols — drawn custom
+          if (data.section === 'body' && (data.column.index === 6 || data.column.index === 7)) {
             data.cell.styles.textColor = [253, 246, 240];
-            data.cell.styles.minCellHeight = 16;
+            data.cell.styles.minCellHeight = 14;
           }
         },
 
@@ -4346,84 +4405,81 @@
           if (data.section !== 'body') return;
           const { x, y, width, height } = data.cell;
 
-          // ── Status badge (col 8)
-          if (data.column.index === 8) {
+          // ── Status badge (col 10)
+          if (data.column.index === 10) {
             const val = data.cell.raw;
             const [r, g, b] = statusColor(val);
-            const bw = Math.min(width - 6, 22), bh = 6;
+            const bw = Math.min(width - 4, 20), bh = 5.5;
             const bx = x + (width - bw) / 2, by = y + (height - bh) / 2;
             doc.setFillColor(r, g, b);
-            doc.roundedRect(bx, by, bw, bh, 1.8, 1.8, 'F');
+            doc.roundedRect(bx, by, bw, bh, 1.5, 1.5, 'F');
             doc.setFont('helvetica', 'bold');
-            doc.setFontSize(6.5);
+            doc.setFontSize(6);
             doc.setTextColor(255, 255, 255);
-            doc.text(val, bx + bw / 2, by + bh / 2 + 0.5, { align: 'center', baseline: 'middle' });
+            doc.text(val, bx + bw / 2, by + bh / 2 + 0.4, { align: 'center', baseline: 'middle' });
           }
 
-          // ── FE% progress (col 6)
+          // ── Deployment badge (col 11)
+          if (data.column.index === 11) {
+            const val = data.cell.raw;
+            if (val && val !== '—') {
+              const [r, g, b] = deployColor(val);
+              const label = val === 'Deployed' ? 'Deployed' : 'Not Yet';
+              const bw = Math.min(width - 4, 22), bh = 5.5;
+              const bx = x + (width - bw) / 2, by = y + (height - bh) / 2;
+              doc.setFillColor(r, g, b, 0.15);
+              doc.setDrawColor(r, g, b);
+              doc.setLineWidth(0.3);
+              doc.roundedRect(bx, by, bw, bh, 1.5, 1.5, 'FD');
+              doc.setFont('helvetica', 'bold');
+              doc.setFontSize(6);
+              doc.setTextColor(r, g, b);
+              doc.text(label, bx + bw / 2, by + bh / 2 + 0.4, { align: 'center', baseline: 'middle' });
+            }
+          }
+
+          // ── FE% progress bar (col 6)
           if (data.column.index === 6) {
             const val = parseInt(data.cell.raw) || 0;
-            const barW = width - 10, barH = 3;
-            const bx = x + 5;
-            const labelY = y + (height / 2) - 3;
-            const barY = y + (height / 2) + 3;
-            // Label
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(8);
-            doc.setTextColor(61, 43, 34);
+            const barW = width - 6, barH = 2.5;
+            const bx = x + 3, labelY = y + (height / 2) - 2, barY = y + (height / 2) + 2;
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(61, 43, 34);
             doc.text(`${val}%`, x + width / 2, labelY, { align: 'center', baseline: 'middle' });
-            // Track
             doc.setFillColor(232, 213, 196);
             doc.roundedRect(bx, barY, barW, barH, 1, 1, 'F');
-            // Fill
             if (val > 0) {
               doc.setFillColor(201, 99, 122);
               doc.roundedRect(bx, barY, (barW * val) / 100, barH, 1, 1, 'F');
             }
           }
 
-          // ── BE% progress (col 7)
+          // ── BE% progress bar (col 7)
           if (data.column.index === 7) {
             const val = parseInt(data.cell.raw) || 0;
-            const barW = width - 10, barH = 3;
-            const bx = x + 5;
-            const labelY = y + (height / 2) - 3;
-            const barY = y + (height / 2) + 3;
-            // Label
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(8);
-            doc.setTextColor(61, 43, 34);
+            const barW = width - 6, barH = 2.5;
+            const bx = x + 3, labelY = y + (height / 2) - 2, barY = y + (height / 2) + 2;
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(61, 43, 34);
             doc.text(`${val}%`, x + width / 2, labelY, { align: 'center', baseline: 'middle' });
-            // Track
             doc.setFillColor(232, 213, 196);
             doc.roundedRect(bx, barY, barW, barH, 1, 1, 'F');
-            // Fill
             if (val > 0) {
               doc.setFillColor(176, 112, 96);
               doc.roundedRect(bx, barY, (barW * val) / 100, barH, 1, 1, 'F');
             }
           }
 
-          // ── UI/UX Status dot (col 4)
-          if (data.column.index === 4) {
-            const val = data.cell.raw;
-            const [r, g, b] = statusColor(val);
-            doc.setFillColor(r, g, b);
-            doc.circle(x + 6, y + height / 2, 1.5, 'F');
+          // ── UI/UX status dot (col 3)
+          if (data.column.index === 3) {
+            const parts = data.cell.raw.split('\n');
+            const statusVal = parts[1] || '';
+            if (statusVal) {
+              const [r, g, b] = statusColor(statusVal);
+              doc.setFillColor(r, g, b);
+              doc.circle(x + 4, y + height / 2, 1.2, 'F');
+            }
           }
         },
       });
-
-      // ── Footer
-      const finalY = doc.lastAutoTable.finalY + 5;
-      doc.setDrawColor(232, 213, 196);
-      doc.setLineWidth(0.3);
-      doc.line(10, finalY, pageW - 10, finalY);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(6.5);
-      doc.setTextColor(160, 128, 112);
-      doc.text('Operations Monitoring · Web Development Pipeline', 10, finalY + 4);
-      doc.text('Page 1', pageW - 10, finalY + 4, { align: 'right' });
 
       hideLoading();
       logActivity('edit', 'Exported PDF', `${visible.length} records exported`);

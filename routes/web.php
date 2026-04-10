@@ -1,26 +1,38 @@
 <?php
 
 use App\Http\Controllers\OperationController;
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 
-// Main UI
-Route::get('/', [OperationController::class, 'index'])->name('operations.index');
+// ══ AUTH ROUTES (guests only) ══
+Route::get('/login', [LoginController::class, 'showForm'])->name('login')->middleware('guest');
+Route::post('/login', [LoginController::class, 'login'])->name('login.post')->middleware('guest');
+Route::post('/register', [LoginController::class, 'register'])->name('register')->middleware('guest');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
-// ⚠️ FIXED: Static routes FIRST before any {wildcards}
-Route::delete('/operations/trash/empty', [OperationController::class, 'emptyBin'])->name('operations.emptyBin');
+// ══ PROTECTED ROUTES (must be logged in) ══
+Route::middleware('auth')->group(function () {
 
-// Add, Edit, Soft Delete
-Route::post('/operations', [OperationController::class, 'store'])->name('operations.store');
-Route::patch('/operations/{operation}', [OperationController::class, 'update'])->name('operations.update');
-Route::delete('/operations/{operation}', [OperationController::class, 'destroy'])->name('operations.destroy');
+    // Main UI
+    Route::get('/', [OperationController::class, 'index'])->name('operations.index');
 
-// Recycle Bin Actions
-Route::post('/operations/{id}/restore', [OperationController::class, 'restore'])->name('operations.restore');
-Route::delete('/operations/{id}/force', [OperationController::class, 'forceDelete'])->name('operations.force');
+    // ⚠️ Static routes FIRST before any {wildcards}
+    Route::delete('/operations/trash/empty', [OperationController::class, 'emptyBin'])->name('operations.emptyBin');
 
-// Archive Actions
-Route::post('/operations/{id}/archive', [OperationController::class, 'archive'])->name('operations.archive');
-Route::post('/operations/{id}/unarchive', [OperationController::class, 'unarchive'])->name('operations.unarchive');
+    // Add, Edit, Soft Delete
+    Route::post('/operations', [OperationController::class, 'store'])->name('operations.store');
+    Route::patch('/operations/{operation}', [OperationController::class, 'update'])->name('operations.update');
+    Route::delete('/operations/{operation}', [OperationController::class, 'destroy'])->name('operations.destroy');
 
-// Clear Logs
-Route::delete('/activity-logs/clear', [OperationController::class, 'clearLogs'])->name('logs.clear');
+    // Recycle Bin Actions
+    Route::post('/operations/{id}/restore', [OperationController::class, 'restore'])->name('operations.restore');
+    Route::delete('/operations/{id}/force', [OperationController::class, 'forceDelete'])->name('operations.force');
+
+    // Archive Actions
+    Route::post('/operations/{id}/archive', [OperationController::class, 'archive'])->name('operations.archive');
+    Route::post('/operations/{id}/unarchive', [OperationController::class, 'unarchive'])->name('operations.unarchive');
+
+    // Clear Logs
+    Route::delete('/activity-logs/clear', [OperationController::class, 'clearLogs'])->name('logs.clear');
+
+});
