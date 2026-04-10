@@ -4168,7 +4168,7 @@
       }, 400);
     }
 
-    async function async function exportPDF() {
+    async function exportPDF() {
       document.getElementById('export-dropdown').classList.remove('open');
       showLoading('Generating PDF…');
 
