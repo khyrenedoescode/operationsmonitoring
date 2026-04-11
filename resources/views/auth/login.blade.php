@@ -1030,7 +1030,7 @@
       </div>
 
     </div>
-    <div class="auth-footer">© 2025 R Web Solutions · All rights reserved</div>
+    <div class="auth-footer">© 2026 R Web Solutions · All rights reserved</div>
   </div>
 
   <script>
