@@ -442,20 +442,24 @@
    HEADER
     ══════════════════════════════════════════════ */
     .header {
-      display: flex;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
       align-items: center;
-      justify-content: space-between;
       margin-bottom: 28px;
-      /* reduced from 48px */
       padding-bottom: 20px;
-      /* reduced from 32px */
       border-bottom: 1px solid var(--border);
       animation: slideDown .5s ease both;
-      flex-wrap: wrap;
       gap: 12px;
-      /* reduced from 16px */
       position: relative;
       z-index: 1001;
+    }
+
+    .header-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     .header-left h1 {
@@ -517,14 +521,14 @@
       position: relative;
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
+      gap: 6px;
+      padding: 7px 12px;
       border-radius: 12px;
       border: 1.5px solid var(--border);
       background: var(--surface2);
       cursor: pointer;
       font-family: 'Poppins', sans-serif;
-      font-size: .72rem;
+      font-size: .68rem;
       color: var(--muted2);
       transition: all .3s;
       animation: popIn .5s ease .05s both;
@@ -566,18 +570,18 @@
     }
 
     /* Activity Log btn */
-    .log-btn {
+   .log-btn {
       position: relative;
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
+      gap: 6px;
+      padding: 7px 12px;
       border-radius: 12px;
       border: 1.5px solid var(--border);
       background: var(--surface2);
       cursor: pointer;
       font-family: 'Poppins', sans-serif;
-      font-size: .72rem;
+      font-size: .68rem;
       color: var(--muted2);
       transition: all .3s;
       animation: popIn .5s ease .07s both;
@@ -619,18 +623,18 @@
     }
 
     /* Export btn */
-    .export-btn {
+   .export-btn {
       position: relative;
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
+      gap: 6px;
+      padding: 7px 12px;
       border-radius: 12px;
       border: 1.5px solid var(--border);
       background: var(--surface2);
       cursor: pointer;
       font-family: 'Poppins', sans-serif;
-      font-size: .72rem;
+      font-size: .68rem;
       color: var(--muted2);
       transition: all .3s;
       animation: popIn .5s ease .08s both;
@@ -775,9 +779,82 @@
       height: 14px;
     }
 
-    .logout-btn:hover {
+   .logout-btn:hover {
       border-color: var(--revision) !important;
       color: var(--revision) !important;
+    }
+
+    .admin-menu-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .admin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      font-family: 'Poppins', sans-serif;
+      font-size: .72rem;
+      cursor: pointer;
+      transition: all .2s;
+      animation: popIn .5s ease .08s both;
+    }
+
+    .admin-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .admin-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      z-index: 1002;
+      min-width: 180px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 16px 36px rgba(0,0,0,.14);
+      overflow: hidden;
+      animation: dropIn .18s ease;
+    }
+
+    .admin-dropdown.open {
+      display: block;
+    }
+
+    .admin-dropdown-item {
+      display: block;
+      width: 100%;
+      padding: 12px 14px;
+      font-size: .78rem;
+      color: var(--text);
+      text-align: left;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .admin-dropdown-item.admin-fullname {
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+      cursor: default;
+    }
+
+    .admin-dropdown-item.admin-logout {
+      color: var(--accent3);
+    }
+
+    .admin-dropdown-item.admin-logout:hover {
+      background: var(--surface2);
     }
 
     /* ══════════════════════════════════════════════
@@ -2865,18 +2942,18 @@
     }
 
     /* Archive nav btn (header) */
-    .archive-nav-btn {
+   .archive-nav-btn {
       position: relative;
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
+      gap: 6px;
+      padding: 7px 12px;
       border-radius: 12px;
       border: 1.5px solid var(--border);
       background: var(--surface2);
       cursor: pointer;
       font-family: 'Poppins', sans-serif;
-      font-size: .72rem;
+      font-size: .68rem;
       color: var(--muted2);
       transition: all .3s;
       animation: popIn .5s ease .04s both;
@@ -3321,13 +3398,13 @@
   <div class="bg-orb bg-orb-3"></div>
   <div class="wrapper">
 
-    <!-- ══ HEADER ══ -->
+   <!-- ══ HEADER ══ -->
     <div class="header">
       <div class="header-left">
         <h1>Operations Monitoring</h1>
         <p>Web Development Pipeline &nbsp;·&mdash;&nbsp; Click any cell to edit</p>
       </div>
-      <div class="header-right">
+      <div class="header-center">
         <div class="stat-pill"><span class="dot" style="background:var(--done)"></span>Done <strong
             id="cnt-done">0</strong></div>
         <div class="stat-pill"><span class="dot" style="background:var(--onhold)"></span>On Hold <strong
@@ -3404,20 +3481,23 @@
           <span class="recycle-badge hidden" id="bin-badge">0</span>
         </button>
 
-        <!-- Logout -->
-        <form method="POST" action="{{ route('logout') }}" style="display:inline;">
-          @csrf
-          <button type="submit" class="recycle-btn"
-            style="border-color:var(--border);animation:popIn .5s ease .09s both;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
-            <span>{{ Auth::user()->name }}</span>
+        </div>
+
+      <div class="header-right">
+        <!-- Admin dropdown -->
+        <div class="admin-menu-wrap">
+          <button class="admin-btn" onclick="toggleAdminDrop(event)" title="Account">
+            <span>👤</span>
+            <span>{{ explode(' ', Auth::user()->name)[0] }}</span>
           </button>
-        </form>
+          <div class="admin-dropdown" id="admin-dropdown">
+            <div class="admin-dropdown-item admin-fullname">{{ Auth::user()->name }}</div>
+            <form method="POST" action="{{ route('logout') }}">
+              @csrf
+              <button type="submit" class="admin-dropdown-item admin-logout">Log out</button>
+            </form>
+          </div>
+        </div>
 
         <!-- Theme Toggle -->
         <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
@@ -4163,9 +4243,14 @@
     /* ════════════════════════════════════════════════
        EXPORT
     ════════════════════════════════════════════════ */
-    function toggleExportDrop(e) {
+   function toggleExportDrop(e) {
       e.stopPropagation();
       document.getElementById('export-dropdown').classList.toggle('open');
+    }
+
+    function toggleAdminDrop(e) {
+      e.stopPropagation();
+      document.getElementById('admin-dropdown').classList.toggle('open');
     }
 
     function exportXLSX() {
@@ -4498,6 +4583,8 @@
 
     document.addEventListener('click', () => {
       document.getElementById('export-dropdown').classList.remove('open');
+      const adminDropdown = document.getElementById('admin-dropdown');
+      if (adminDropdown) adminDropdown.classList.remove('open');
     });
 
     /* ════════════════════════════════════════════════
