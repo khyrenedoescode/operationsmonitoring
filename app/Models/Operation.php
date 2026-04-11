@@ -12,6 +12,7 @@ class Operation extends Model
     protected $fillable = [
         'client',
         'tag',
+        'user_id',
         'stage',
         'prop_assign',
         'prop_remark',
