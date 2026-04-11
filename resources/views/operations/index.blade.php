@@ -4620,14 +4620,6 @@
         <option value="Not Deployed"${r.deployment_status === 'Not Deployed' ? ' selected' : ''}>Undeployed</option>
       </select>
     </div>
-    ${r.deployment_status ? `
-    <div style="display:inline-flex;align-items:center;gap:5px;margin-top:5px;padding:3px 9px;border-radius:6px;font-size:.68rem;font-weight:600;
-      background:${r.deployment_status === 'Deployed' ? 'rgba(90,154,106,.12)' : 'rgba(176,128,32,.12)'};
-      color:${r.deployment_status === 'Deployed' ? 'var(--done)' : 'var(--onhold)'};
-      border:1px solid ${r.deployment_status === 'Deployed' ? 'rgba(90,154,106,.3)' : 'rgba(176,128,32,.3)'};">
-      <div style="width:6px;height:6px;border-radius:50%;background:${r.deployment_status === 'Deployed' ? 'var(--done)' : 'var(--onhold)'};"></div>
-      ${r.deployment_status === 'Deployed' ? 'Deployed' : 'Not Deployed Yet'}
-    </div>` : ''}
   </div>
 
   <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
