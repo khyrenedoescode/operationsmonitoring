@@ -1,7 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="light" id="html-root">
 
 <head>
+  <script>
+    (function() {
+      const saved = localStorage.getItem('theme');
+      if (saved) document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -5445,7 +5451,9 @@
     function toggleTheme() {
       const html = document.documentElement,
         dark = html.getAttribute('data-theme') === 'dark';
-      html.setAttribute('data-theme', dark ? 'light' : 'dark');
+      const newTheme = dark ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
       const sunEl = document.getElementById('theme-icon-sun'),
         moonEl = document.getElementById('theme-icon-moon'),
         labelEl = document.getElementById('theme-label');
@@ -5875,6 +5883,24 @@
     renderTable();
     updateArchiveBadge();
     setTimeout(checkOverdueOnLoad, 800); // slight delay so table renders first
+
+    // Sync theme toggle UI on load
+    (function() {
+      const saved = localStorage.getItem('theme') || 'light';
+      const isDark = saved === 'dark';
+      const sunEl = document.getElementById('theme-icon-sun');
+      const moonEl = document.getElementById('theme-icon-moon');
+      const labelEl = document.getElementById('theme-label');
+      if (isDark) {
+        sunEl.style.display = 'none';
+        moonEl.style.display = '';
+        labelEl.textContent = 'Light';
+      } else {
+        sunEl.style.display = '';
+        moonEl.style.display = 'none';
+        labelEl.textContent = 'Dark';
+      }
+    })(); // slight delay so table renders first
 
     /* ════ DRAG TO SCROLL TABLE ════ */
     (function () {
