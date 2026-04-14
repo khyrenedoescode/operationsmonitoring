@@ -815,8 +815,8 @@
             <path d="M2 12l10 5 10-5" />
           </svg>
         </div>
-        <h1>R Web Solutions</h1>
-        <p>Operations Portal</p>
+        <h1>Operations Portal</h1>
+        <p>R Web Solutions</p>
       </div>
 
       <div class="tab-row">
