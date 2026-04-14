@@ -3,7 +3,7 @@
 
 <head>
   <script>
-    (function() {
+    (function () {
       const saved = localStorage.getItem('theme');
       if (saved) document.documentElement.setAttribute('data-theme', saved);
     })();
@@ -576,7 +576,7 @@
     }
 
     /* Activity Log btn */
-   .log-btn {
+    .log-btn {
       position: relative;
       display: flex;
       align-items: center;
@@ -629,7 +629,7 @@
     }
 
     /* Export btn */
-   .export-btn {
+    .export-btn {
       position: relative;
       display: flex;
       align-items: center;
@@ -785,7 +785,7 @@
       height: 14px;
     }
 
-   .logout-btn:hover {
+    .logout-btn:hover {
       border-color: var(--revision) !important;
       color: var(--revision) !important;
     }
@@ -827,7 +827,7 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 14px;
-      box-shadow: 0 16px 36px rgba(0,0,0,.14);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, .14);
       overflow: hidden;
       animation: dropIn .18s ease;
     }
@@ -2461,9 +2461,9 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 18px;
-      padding: 32px;
-      width: min(640px, 94vw);
-      max-height: 90vh;
+      padding: 32px 36px;
+      width: min(780px, 96vw);
+      max-height: 92vh;
       overflow-y: auto;
       box-shadow: 0 24px 64px var(--shadow);
       animation: modalIn .28s cubic-bezier(.22, 1, .36, 1);
@@ -2474,7 +2474,61 @@
       font-size: 1.25rem;
       font-weight: 700;
       color: var(--text);
-      margin-bottom: 22px;
+      margin-bottom: 4px;
+    }
+
+    .modal-header-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(201, 99, 122, 0.1) 0%, rgba(232, 160, 176, 0.08) 100%);
+      border-radius: 14px;
+      border: 1px solid rgba(201, 99, 122, 0.15);
+    }
+
+    [data-theme="dark"] .modal-header-section {
+      background: linear-gradient(135deg, rgba(255, 143, 163, 0.12) 0%, rgba(255, 179, 193, 0.08) 100%);
+      border-color: rgba(255, 143, 163, 0.15);
+    }
+
+    .modal-header-content {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+    }
+
+    .modal-header-icon {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .modal-header-icon svg {
+      width: 100%;
+      height: 100%;
+      stroke: var(--accent);
+      fill: none;
+      stroke-width: 2.5;
+    }
+
+    .modal-header-text h2 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .modal-header-text p {
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      font-weight: 500;
     }
 
     .form-grid {
@@ -2517,6 +2571,10 @@
       resize: vertical;
     }
 
+    .form-group select {
+      padding-right: 12px;
+    }
+
     .form-group input:focus,
     .form-group select:focus,
     .form-group textarea:focus {
@@ -2533,6 +2591,8 @@
       justify-content: flex-end;
       gap: 10px;
       margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
     }
 
     .btn-cancel {
@@ -2568,6 +2628,48 @@
     .btn-save:hover {
       background: var(--accent3);
       transform: translateY(-1px);
+    }
+
+    /* ══ MODAL PHASE BLOCKS ══ */
+    .modal-phase-block {
+      border: 0;
+      border-top: 1px solid var(--border);
+      border-radius: 0;
+      overflow: visible;
+      margin-bottom: 0;
+      padding-top: 20px;
+      margin-top: 20px;
+    }
+
+    .modal-phase-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 0 14px 0;
+      background: transparent;
+      border-bottom: 0;
+    }
+
+    .modal-phase-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .modal-phase-label {
+      font-size: .65rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted2);
+    }
+
+    .modal-phase-fields {
+      display: grid;
+      gap: 14px;
+      padding: 0;
+      background: transparent;
     }
 
     /* ══════════════════════════════════════════════
@@ -2948,7 +3050,7 @@
     }
 
     /* Archive nav btn (header) */
-   .archive-nav-btn {
+    .archive-nav-btn {
       position: relative;
       display: flex;
       align-items: center;
@@ -3395,6 +3497,7 @@
       color: var(--muted2);
       font-weight: 500;
     }
+
   </style>
 </head>
 
@@ -3404,7 +3507,7 @@
   <div class="bg-orb bg-orb-3"></div>
   <div class="wrapper">
 
-   <!-- ══ HEADER ══ -->
+    <!-- ══ HEADER ══ -->
     <div class="header">
       <div class="header-left">
         <h1>Operations Monitoring</h1>
@@ -3487,7 +3590,7 @@
           <span class="recycle-badge hidden" id="bin-badge">0</span>
         </button>
 
-        </div>
+      </div>
 
       <div class="header-right">
         <!-- Admin dropdown -->
@@ -3757,89 +3860,191 @@
   <!-- ══ ADD CLIENT MODAL ══ -->
   <div class="modal-overlay" id="modal">
     <div class="modal">
-      <h2>✦ Add New Client</h2>
-      <div class="form-grid">
-        <div class="form-group full"><label>Client Name</label><input type="text" id="f-client"
-            placeholder="e.g. Acme Corp" /></div>
-        <div class="form-group"><label>Proposal Stage</label>
-          <select id="f-stage">
-            <option>Sitemap</option>
-            <option>Homepage</option>
-            <option>All Pages</option>
-            <option>Final Homepage</option>
-          </select>
-        </div>
 
-        <div class="form-group"><label>UI/UX Status</label>
-          <select id="f-uiux-status">
-            <option>On Hold</option>
-            <option>Done</option>
-            <option>Revisions</option>
-          </select>
+      <div class="modal-header-section">
+        <div class="modal-header-content">
+          <div class="modal-header-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            </svg>
+          </div>
+          <div class="modal-header-text">
+            <h2>Add New Client</h2>
+            <p>Fill in the details across each project phase</p>
+          </div>
         </div>
-        <div class="form-group"><label>UI/UX Assigned</label>
-          <input type="text" id="f-uiux-assign" placeholder="Name..." list="uiux-assignee-list" autocomplete="off" />
-        </div>
-        <div class="form-group"><label>Dev Assigned</label>
-          <input type="text" id="f-dev-assign" placeholder="Name..." list="dev-assignee-list" autocomplete="off" />
-        </div>
-        <datalist id="uiux-assignee-list">
-          <option value="Nicolle">
-          <option value="Kent">
-        </datalist>
-        <datalist id="dev-assignee-list">
-          <option value="Anthony">
-          <option value="Adrian">
-          <option value="Ahadon">
-          <option value="Kef">
-          <option value="John Carl">
-        </datalist>
-
-        <div class="form-group"><label>Front-end Status</label>
-          <select id="f-dev-fe">
-            <option value="">—</option>
-            <option>Done</option>
-            <option>In Progress</option>
-            <option>Pending</option>
-          </select>
-        </div>
-        <div class="form-group"><label>Back-end Status</label>
-          <select id="f-dev-be">
-            <option value="">—</option>
-            <option>Done</option>
-            <option>In Progress</option>
-            <option>Pending</option>
-          </select>
-        </div>
-        <div class="form-group"><label>Status</label>
-          <select id="f-status">
-            <option>Done</option>
-            <option>On Hold</option>
-            <option>Revisions</option>
-          </select>
-        </div>
-        <div class="form-group"><label>Dev Due Date</label><input type="date" id="f-dev-due" /></div>
-        <div class="form-group"><label>Due Date</label><input type="date" id="f-due" /></div>
-        <div class="form-group"><label>Frontend %</label><input type="number" id="f-fe" min="0" max="100"
-            placeholder="0–100" /></div>
-        <div class="form-group"><label>Backend %</label><input type="number" id="f-be" min="0" max="100"
-            placeholder="0–100" /></div>
-        <div class="form-group full"><label>Proposal Remarks</label><textarea id="f-prop-remark" rows="2"
-            placeholder="Notes about this proposal..."></textarea></div>
-        <div class="form-group"><label>Deployment Status</label>
-          <select id="f-deployment-status">
-            <option value="">— Not Set —</option>
-            <option value="Deployed">Deployed</option>
-            <option value="Not Deployed">Not Deployed</option>
-          </select>
-        </div>
-        <div class="form-group full"><label>Final Remarks</label><textarea id="f-final-remark" rows="2"
-            placeholder="Closing notes, delivery status..."></textarea></div>
+        <button class="bin-close-btn" onclick="closeModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
       </div>
+
+      <!-- Client Name -->
+      <div class="form-group full" style="margin-bottom:18px;">
+        <label>Client Name</label>
+        <input type="text" id="f-client" placeholder="e.g. Acme Corp" />
+      </div>
+
+      <!-- PROPOSAL PHASE -->
+      <div class="modal-phase-block" style="--phase-color:var(--accent);">
+        <div class="modal-phase-header">
+          <span class="modal-phase-dot" style="background:var(--accent);"></span>
+          <span class="modal-phase-label">Proposal Phase</span>
+        </div>
+        <div class="modal-phase-fields" style="grid-template-columns:1fr 1fr;">
+          <div class="form-group">
+            <label>Proposal Stage</label>
+            <select id="f-stage">
+              <option>Sitemap</option>
+              <option>Homepage</option>
+              <option>All Pages</option>
+              <option>Final Homepage</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Proposal Remarks</label>
+            <input type="text" id="f-prop-remark" placeholder="Notes about this proposal..." />
+          </div>
+        </div>
+      </div>
+
+      <!-- UI/UX PHASE -->
+      <div class="modal-phase-block" style="--phase-color:var(--accent2);">
+        <div class="modal-phase-header">
+          <span class="modal-phase-dot" style="background:var(--accent2);"></span>
+          <span class="modal-phase-label">UI/UX</span>
+        </div>
+        <div class="modal-phase-fields" style="grid-template-columns:1fr 1fr 1fr;">
+          <div class="form-group">
+            <label>UI/UX Assigned</label>
+            <input type="text" id="f-uiux-assign" placeholder="Name..." list="uiux-assignee-list" autocomplete="off" />
+            <datalist id="uiux-assignee-list">
+              <option value="Nicolle">
+              <option value="Kent">
+            </datalist>
+          </div>
+          <div class="form-group">
+            <label>UI/UX Status</label>
+            <select id="f-uiux-status">
+              <option>On Hold</option>
+              <option>Done</option>
+              <option>Revisions</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>UI/UX Due Date</label>
+            <input type="date" id="f-uiux-due" />
+          </div>
+        </div>
+      </div>
+
+      <!-- DEVELOPMENT PHASE -->
+      <div class="modal-phase-block" style="--phase-color:var(--accent3);">
+        <div class="modal-phase-header">
+          <span class="modal-phase-dot" style="background:var(--accent3);"></span>
+          <span class="modal-phase-label">Development Phase</span>
+        </div>
+        <div class="modal-phase-fields" style="grid-template-columns:1fr 1fr;">
+          <div class="form-group">
+            <label>Dev Assigned</label>
+            <input type="text" id="f-dev-assign" placeholder="Name..." list="dev-assignee-list" autocomplete="off" />
+            <datalist id="dev-assignee-list">
+              <option value="Anthony">
+              <option value="Adrian">
+              <option value="Ahadon">
+              <option value="Kef">
+              <option value="John Carl">
+            </datalist>
+          </div>
+          <div class="form-group">
+            <label>Dev Due Date</label>
+            <input type="date" id="f-dev-due" />
+          </div>
+          <div class="form-group">
+            <label>Front-end Status</label>
+            <select id="f-dev-fe">
+              <option value="">—</option>
+              <option>Done</option>
+              <option>In Progress</option>
+              <option>Pending</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Back-end Status</label>
+            <select id="f-dev-be">
+              <option value="">—</option>
+              <option>Done</option>
+              <option>In Progress</option>
+              <option>Pending</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Frontend %</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="number" id="f-fe" min="0" max="100" placeholder="0–100" style="flex:0 0 80px;"
+                oninput="this.value=Math.min(100,Math.max(0,parseInt(this.value)||0));updateModalBar('f-fe','mbar-fe')" />
+              <div style="flex:1;height:5px;border-radius:99px;background:var(--border);overflow:hidden;">
+                <div id="mbar-fe"
+                  style="height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--pink),var(--accent));transition:width .3s;">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Backend %</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="number" id="f-be" min="0" max="100" placeholder="0–100" style="flex:0 0 80px;"
+                oninput="this.value=Math.min(100,Math.max(0,parseInt(this.value)||0));updateModalBar('f-be','mbar-be')" />
+              <div style="flex:1;height:5px;border-radius:99px;background:var(--border);overflow:hidden;">
+                <div id="mbar-be"
+                  style="height:100%;width:0%;border-radius:99px;background:linear-gradient(90deg,var(--cream),var(--accent3));transition:width .3s;">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Overall Status</label>
+            <select id="f-status">
+              <option>On Hold</option>
+              <option>Done</option>
+              <option>Revisions</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- FINAL PHASE -->
+      <div class="modal-phase-block" style="--phase-color:var(--onhold);">
+        <div class="modal-phase-header">
+          <span class="modal-phase-dot" style="background:var(--onhold);"></span>
+          <span class="modal-phase-label">Final</span>
+        </div>
+        <div class="modal-phase-fields" style="grid-template-columns:1fr 1fr;">
+          <div class="form-group">
+            <label>Due Date</label>
+            <input type="date" id="f-due" />
+          </div>
+          <div class="form-group">
+            <label>Deployment Status</label>
+            <select id="f-deployment-status">
+              <option value="">— Not Set —</option>
+              <option value="Deployed">Deployed</option>
+              <option value="Not Deployed">Not Deployed</option>
+            </select>
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label>Final Remarks</label>
+            <textarea id="f-final-remark" rows="2" placeholder="Closing notes, delivery status..."></textarea>
+          </div>
+        </div>
+      </div>
+
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeModal()">Cancel</button>
         <button class="btn-save" onclick="addRow()">Add Client</button>
       </div>
+
     </div>
   </div>
 
@@ -4249,7 +4454,7 @@
     /* ════════════════════════════════════════════════
        EXPORT
     ════════════════════════════════════════════════ */
-   function toggleExportDrop(e) {
+    function toggleExportDrop(e) {
       e.stopPropagation();
       document.getElementById('export-dropdown').classList.toggle('open');
     }
@@ -4646,7 +4851,18 @@
               onchange="saveVal(${i},'uiux_due',this.value);rerenderUiuxDue(${i},this.value)" />
           </span>
         </div>
-        <div id="uiux-due-notif-${i}">${getDueDateNotification(r.uiux_due)}</div>
+        <div id="uiux-due-notif-${i}">
+  ${r.deployment_status === 'Deployed'
+          ? `<div class="due-notification safe">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg> 
+        Deployed — on schedule
+      </div>`
+          : getDueDateNotification(r.uiux_due)
+        }
+</div>
       </div>
     </td>
     <td class="col-sep">
@@ -4698,7 +4914,18 @@
           onchange="saveVal(${i},'dev_due',this.value);rerenderDevDue(${i},this.value)" />
       </span>
     </div>
-    <div id="dev-due-notif-${i}">${getDueDateNotification(r.dev_due)}</div>
+    <div id="dev-due-notif-${i}">
+  ${r.deployment_status === 'Deployed'
+          ? `<div class="due-notification safe">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg> 
+        Deployed — on schedule
+      </div>`
+          : getDueDateNotification(r.dev_due)
+        }
+</div>
   </div>
   </td>
     <td class="col-sep">
@@ -4900,6 +5127,21 @@
       if (key === 'stage') {
         const tr = document.getElementById('row-' + i);
         if (tr) tr.querySelector('.steps').innerHTML = buildSteps(val);
+      }
+      // ← ADD THIS BLOCK
+      if (key === 'deployment_status') {
+        const uiuxNotif = document.getElementById('uiux-due-notif-' + i);
+        const devNotif = document.getElementById('dev-due-notif-' + i);
+        const badge = val === 'Deployed'
+          ? `<div class="due-notification safe">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg> Deployed — on schedule
+         </div>`
+          : '';
+        if (uiuxNotif) uiuxNotif.innerHTML = val === 'Deployed' ? badge : getDueDateNotification(rows[i].uiux_due);
+        if (devNotif) devNotif.innerHTML = val === 'Deployed' ? badge : getDueDateNotification(rows[i].dev_due);
       }
       logActivity('edit', `Changed ${key.replace(/_/g, ' ')} for ${rows[i].client}`, `→ "${val}"`);
       toast('Saved ✓');
@@ -5302,6 +5544,11 @@
     /* ════════════════════════════════════════════════
        ADD MODAL & ADD ROW LOGIC
     ════════════════════════════════════════════════ */
+
+    function updateModalBar(inputId, barId) {
+      const val = Math.min(100, Math.max(0, parseInt(document.getElementById(inputId).value) || 0));
+      document.getElementById(barId).style.width = val + '%';
+    }
 
     // Opens the Add Client Modal
     function openModal() {
@@ -5885,7 +6132,7 @@
     setTimeout(checkOverdueOnLoad, 800); // slight delay so table renders first
 
     // Sync theme toggle UI on load
-    (function() {
+    (function () {
       const saved = localStorage.getItem('theme') || 'light';
       const isDark = saved === 'dark';
       const sunEl = document.getElementById('theme-icon-sun');
