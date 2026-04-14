@@ -11,34 +11,21 @@ class OperationController extends Controller
     /* ─── INDEX ─── */
     public function index()
     {
-        $userId = auth()->id();
+        $rows = Operation::where('is_archived', false)->orderBy('created_at', 'desc')->get()->map(function ($op) {
+            $op->due = $op->due ? $op->due->format('Y-m-d') : null;
+            $op->uiux_due = $op->uiux_due ? $op->uiux_due->format('Y-m-d') : null;
+            $op->dev_due = $op->dev_due ? $op->dev_due->format('Y-m-d') : null;
+            return $op;
+        });
 
-        $rows = Operation::where('user_id', $userId)
-            ->where('is_archived', false)
-            ->orderBy('created_at', 'asc')
-            ->get()->map(function ($op) {
-                $op->due = $op->due ? $op->due->format('Y-m-d') : null;
-                $op->uiux_due = $op->uiux_due ? $op->uiux_due->format('Y-m-d') : null;
-                $op->dev_due = $op->dev_due ? $op->dev_due->format('Y-m-d') : null;
-                return $op;
-            });
-
-        $trash = Operation::onlyTrashed()
-            ->where('user_id', $userId)
-            ->orderBy('deleted_at', 'desc')->get();
-
-        $archived = Operation::where('user_id', $userId)
-            ->where('is_archived', true)
-            ->orderBy('archived_at', 'desc')->get();
-
-        $logs = ActivityLog::where('user_id', $userId)
-            ->orderBy('created_at', 'desc')
-            ->limit(200)->get();
+        $trash = Operation::onlyTrashed()->orderBy('deleted_at', 'desc')->get();
+        $archived = Operation::where('is_archived', true)->orderBy('archived_at', 'desc')->get();
+        $logs = ActivityLog::orderBy('created_at', 'desc')->limit(200)->get();
 
         $isMobile = preg_match('/(android|iphone|ipad|mobile)/i', request()->header('User-Agent'));
 
         if ($isMobile) {
-            return view('operations.mobile', compact('rows', 'trash', 'logs'));
+            return view('operations.mobile', compact('rows', 'trash', 'archived', 'logs'));
         }
 
         return view('operations.index', compact('rows', 'trash', 'archived', 'logs'));
@@ -67,7 +54,6 @@ class OperationController extends Controller
             'deployment_status' => 'nullable|string',
         ]);
 
-        $data['user_id'] = auth()->id();
         $data['prop_assign'] = !empty($data['prop_assign']) ? $data['prop_assign'] : '—';
         $data['dev_assign'] = !empty($data['dev_assign']) ? $data['dev_assign'] : '—';
         $data['fe'] = $data['fe'] ?? 0;
@@ -76,6 +62,7 @@ class OperationController extends Controller
         $data['dev_be'] = $data['dev_be'] ?? '';
         $data['last_edited_by'] = $request->input('edited_by', 'System');
         $data['last_edited_field'] = 'created';
+
         $data['tag'] = 'TEMP-' . uniqid();
 
         $op = Operation::create($data);
@@ -87,7 +74,6 @@ class OperationController extends Controller
             'message' => 'New client added',
             'detail' => $op->client . ' (' . $op->tag . ')',
             'user' => $data['last_edited_by'],
-            'user_id' => auth()->id(),
         ]);
 
         $responseRow = $op->toArray();
@@ -102,14 +88,28 @@ class OperationController extends Controller
         return redirect()->route('operations.index')->with('toast', 'Client added ✓');
     }
 
-    /* ─── PATCH ─── */
+    /* ─── PATCH (inline AJAX field update) ─── */
     public function update(Request $request, Operation $operation)
     {
         $allowed = [
-            'client', 'tag', 'stage', 'prop_assign', 'prop_remark',
-            'uiux_assign', 'uiux_status', 'uiux_due', 'dev_assign',
-            'dev_fe', 'dev_be', 'dev_due', 'fe', 'be', 'status',
-            'due', 'final_remark', 'deployment_status',
+            'client',
+            'tag',
+            'stage',
+            'prop_assign',
+            'prop_remark',
+            'uiux_assign',
+            'uiux_status',
+            'uiux_due',  // ← uiux_due added
+            'dev_assign',
+            'dev_fe',
+            'dev_be',
+            'dev_due',  // ← dev_due added
+            'fe',
+            'be',
+            'status',
+            'due',
+            'final_remark',
+            'deployment_status',
         ];
 
         $field = $request->input('field');
@@ -141,7 +141,6 @@ class OperationController extends Controller
             'message' => ucfirst($field) . ' updated for ' . $operation->client,
             'detail' => $validated['value'],
             'user' => $operation->last_edited_by,
-            'user_id' => auth()->id(),
         ]);
 
         return response()->json([
@@ -162,7 +161,6 @@ class OperationController extends Controller
             'type' => 'delete',
             'message' => $clientName . ' moved to Recycle Bin',
             'user' => request()->input('edited_by', 'System'),
-            'user_id' => auth()->id(),
         ]);
 
         if (request()->expectsJson()) {
@@ -182,7 +180,6 @@ class OperationController extends Controller
             'type' => 'restore',
             'message' => $operation->client . ' restored from Bin',
             'user' => request()->input('edited_by', 'System'),
-            'user_id' => auth()->id(),
         ]);
 
         $responseRow = $operation->toArray();
@@ -204,7 +201,6 @@ class OperationController extends Controller
             'type' => 'delete',
             'message' => $clientName . ' permanently deleted',
             'user' => request()->input('edited_by', 'System'),
-            'user_id' => auth()->id(),
         ]);
 
         return response()->json(['success' => true]);
@@ -222,7 +218,6 @@ class OperationController extends Controller
             'type' => 'edit',
             'message' => $operation->client . ' moved to Archive',
             'user' => request()->input('edited_by', 'System'),
-            'user_id' => auth()->id(),
         ]);
 
         return response()->json(['success' => true]);
@@ -240,7 +235,6 @@ class OperationController extends Controller
             'type' => 'restore',
             'message' => $operation->client . ' restored from Archive',
             'user' => request()->input('edited_by', 'System'),
-            'user_id' => auth()->id(),
         ]);
 
         $responseRow = $operation->toArray();
@@ -251,24 +245,24 @@ class OperationController extends Controller
         return response()->json(['success' => true, 'row' => $responseRow]);
     }
 
-    /* ─── CLEAR LOGS ─── */
+    /* ─── CLEAR LOGS (Permanently delete Activity Logs) ─── */
     public function clearLogs()
     {
         try {
-            ActivityLog::where('user_id', auth()->id())->delete();
+            // Ito ang magbubura sa database sa Aiven
+            \App\Models\ActivityLog::query()->delete();
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
-    /* ─── EMPTY BIN ─── */
+    /* ─── EMPTY BIN (Permanently delete all Operations in Trash) ─── */
     public function emptyBin()
     {
         try {
-            Operation::onlyTrashed()
-                ->where('user_id', auth()->id())
-                ->forceDelete();
+            // Ito ang magbubura sa database operations table na naka-soft delete
+            \App\Models\Operation::onlyTrashed()->forceDelete();
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
