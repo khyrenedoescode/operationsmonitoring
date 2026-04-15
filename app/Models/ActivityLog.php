@@ -10,6 +10,7 @@ class ActivityLog extends Model
         'type',
         'message',
         'detail',
+        'user_id',
         'user',
     ];
 
