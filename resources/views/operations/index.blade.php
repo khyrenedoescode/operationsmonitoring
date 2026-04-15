@@ -3508,6 +3508,71 @@
       font-weight: 500;
     }
 
+    /* ── AUTOCOMPLETE DROPDOWN ── */
+    .autocomplete-wrap {
+      position: relative;
+    }
+
+    .ac-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 12px 32px var(--shadow);
+      z-index: 3500;
+      animation: slideDown .15s ease;
+    }
+
+    .ac-dropdown.open {
+      display: block;
+    }
+
+    .ac-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--text);
+      transition: background .12s;
+      border-bottom: 1px solid var(--border);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .ac-option:last-child {
+      border-bottom: none;
+    }
+
+    .ac-option:hover,
+    .ac-option:active {
+      background: var(--surface2);
+    }
+
+    .ac-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .7rem;
+      font-weight: 800;
+      flex-shrink: 0;
+      color: #fff;
+    }
+
+    .ac-role {
+      font-size: .58rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
   </style>
 </head>
 
@@ -3875,7 +3940,8 @@
         <div class="modal-header-content">
           <div class="modal-header-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+              <path
+                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
             </svg>
           </div>
           <div class="modal-header-text">
@@ -3928,11 +3994,13 @@
         <div class="modal-phase-fields" style="grid-template-columns:1fr 1fr 1fr;">
           <div class="form-group">
             <label>UI/UX Assigned</label>
-            <input type="text" id="f-uiux-assign" placeholder="Name..." list="uiux-assignee-list" autocomplete="off" />
-            <datalist id="uiux-assignee-list">
-              <option value="Nicolle">
-              <option value="Kent">
-            </datalist>
+            <div class="autocomplete-wrap">
+              <input type="text" id="f-uiux-assign" class="mobile-input" placeholder="Type a name…" autocomplete="off"
+                oninput="acInput('f-uiux-assign','ac-uiux-assign','uiux')"
+                onfocus="acInput('f-uiux-assign','ac-uiux-assign','uiux')"
+                onblur="setTimeout(()=>acClose('ac-uiux-assign'),150)">
+              <div class="ac-dropdown" id="ac-uiux-assign"></div>
+            </div>
           </div>
           <div class="form-group">
             <label>UI/UX Status</label>
@@ -3958,14 +4026,13 @@
         <div class="modal-phase-fields" style="grid-template-columns:1fr 1fr;">
           <div class="form-group">
             <label>Dev Assigned</label>
-            <input type="text" id="f-dev-assign" placeholder="Name..." list="dev-assignee-list" autocomplete="off" />
-            <datalist id="dev-assignee-list">
-              <option value="Anthony">
-              <option value="Adrian">
-              <option value="Ahadon">
-              <option value="Kef">
-              <option value="John Carl">
-            </datalist>
+            <div class="autocomplete-wrap">
+              <input type="text" id="f-dev-assign" class="mobile-input" placeholder="Type a name…" autocomplete="off"
+                oninput="acInput('f-dev-assign','ac-dev-assign','dev')"
+                onfocus="acInput('f-dev-assign','ac-dev-assign','dev')"
+                onblur="setTimeout(()=>acClose('ac-dev-assign'),150)">
+              <div class="ac-dropdown" id="ac-dev-assign"></div>
+            </div>
           </div>
           <div class="form-group">
             <label>Dev Due Date</label>
@@ -6186,6 +6253,57 @@
         wrap.scrollLeft = scrollLeft - (x - startX) * 1.5;
       });
     })();
+
+    /* ════════════════════════════════════════════════
+   AUTOCOMPLETE
+════════════════════════════════════════════════ */
+    const AC_NAMES = {
+      uiux: [
+        { name: 'Nicolle', color: '#c9637a' },
+        { name: 'Kent', color: '#b07060' },
+      ],
+      dev: [
+        { name: 'Anthony', color: '#5a9a6a' },
+        { name: 'Adrian', color: '#6a7ab0' },
+        { name: 'Ahadon', color: '#b08020' },
+        { name: 'Kef', color: '#c9637a' },
+        { name: 'John', color: '#7a6ab0' },
+        { name: 'Carl', color: '#b07060' },
+      ],
+    };
+    AC_NAMES.all = [...AC_NAMES.uiux, ...AC_NAMES.dev];
+
+    function acInput(inputId, dropId, group) {
+      const inp = document.getElementById(inputId);
+      const drop = document.getElementById(dropId);
+      if (!inp || !drop) return;
+      const q = inp.value.trim().toLowerCase();
+      const list = AC_NAMES[group] || AC_NAMES.all;
+      const filtered = q ? list.filter(n => n.name.toLowerCase().includes(q)) : list;
+      if (!filtered.length) { drop.classList.remove('open'); return; }
+      const roleLabel = group === 'uiux' ? 'UI/UX Designer' : 'Developer';
+      drop.innerHTML = filtered.map(n => `
+    <div class="ac-option" onmousedown="acPick('${inputId}','${dropId}','${n.name}')">
+      <div class="ac-avatar" style="background:${n.color}">${n.name[0]}</div>
+      <div>
+        <div>${n.name}</div>
+        <div class="ac-role">${roleLabel}</div>
+      </div>
+    </div>
+  `).join('');
+      drop.classList.add('open');
+    }
+
+    function acPick(inputId, dropId, name) {
+      const inp = document.getElementById(inputId);
+      if (inp) inp.value = name;
+      acClose(dropId);
+    }
+
+    function acClose(dropId) {
+      document.getElementById(dropId)?.classList.remove('open');
+    }
+    
   </script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
