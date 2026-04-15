@@ -59,8 +59,8 @@ class OperationController extends Controller
             'uiux_assign' => 'nullable|string',
             'uiux_status' => 'nullable|string',
             'dev_assign' => 'nullable|string|max:100',
-            'dev_fe' => 'nullable|string|in:,Done,In Progress,Pending',
-            'dev_be' => 'nullable|string|in:,Done,In Progress,Pending',
+            'dev_fe' => 'nullable|in:Done,In Progress,Pending',
+            'dev_be' => 'nullable|in:Done,In Progress,Pending',
             'fe' => 'nullable|integer|min:0|max:100',
             'be' => 'nullable|integer|min:0|max:100',
             'status' => 'required|in:Done,On Hold,Revisions',
@@ -78,8 +78,8 @@ class OperationController extends Controller
         $data['dev_assign'] = $data['dev_assign'] ?: '—';
         $data['fe'] = $data['fe'] ?? 0;
         $data['be'] = $data['be'] ?? 0;
-        $data['dev_fe'] = $data['dev_fe'] ?? '';
-        $data['dev_be'] = $data['dev_be'] ?? '';
+        $data['dev_fe'] = $data['dev_fe'] ?? null;
+        $data['dev_be'] = $data['dev_be'] ?? null;
         $data['last_edited_by'] = $request->input('edited_by', 'System');
         $data['last_edited_field'] = 'created';
 
@@ -118,10 +118,24 @@ class OperationController extends Controller
         }
 
         $allowed = [
-            'client','tag','stage','prop_assign','prop_remark',
-            'uiux_assign','uiux_status','uiux_due',
-            'dev_assign','dev_fe','dev_be','dev_due',
-            'fe','be','status','due','final_remark','deployment_status',
+            'client',
+            'tag',
+            'stage',
+            'prop_assign',
+            'prop_remark',
+            'uiux_assign',
+            'uiux_status',
+            'uiux_due',
+            'dev_assign',
+            'dev_fe',
+            'dev_be',
+            'dev_due',
+            'fe',
+            'be',
+            'status',
+            'due',
+            'final_remark',
+            'deployment_status',
         ];
 
         $field = $request->input('field');
