@@ -3,7 +3,7 @@
 
 <head>
   <script>
-    (function () {
+    (function() {
       const saved = localStorage.getItem('theme');
       if (saved) document.documentElement.setAttribute('data-theme', saved);
     })();
@@ -4008,6 +4008,7 @@
               <option>On Hold</option>
               <option>Done</option>
               <option>Revisions</option>
+              <option>On-Going</option>
             </select>
           </div>
           <div class="form-group">
@@ -4086,6 +4087,7 @@
               <option>On Hold</option>
               <option>Done</option>
               <option>Revisions</option>
+              <option>On-Going</option>
             </select>
           </div>
         </div>
@@ -4218,6 +4220,11 @@
       clearLogs: "{{ route('logs.clear') }}",
     };
 
+    <?php /** @var array $rows */ ?>
+    <?php /** @var array $trash */ ?>
+    <?php /** @var array $archived */ ?>
+    <?php /** @var array $logs */ ?>
+
     let rows = JSON.parse('<?= json_encode($rows, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>');
     let trash = JSON.parse('<?= json_encode($trash, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>');
     let archived = JSON.parse('<?= json_encode($archived, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>');
@@ -4327,12 +4334,13 @@
       return {
         Done: 's-done',
         'On Hold': 's-onhold',
-        Revisions: 's-revision'
-      }[s] || 's-onhold';
+        Revisions: 's-revision',
+        'On-Going': 's-done'
+      } [s] || 's-onhold';
     }
 
     function uiuxBadgeHtml(s, idx) {
-      const opts = ['Done', 'On Hold', 'Revisions'].map(o => `<div class="status-opt" onclick="setUiuxStatus(${idx},'${o}',event)"><span class="sopt-dot" style="background:${o === 'Done' ? 'var(--done)' : o === 'On Hold' ? 'var(--onhold)' : 'var(--revision)'}"></span>${o}</div>`).join('');
+      const opts = ['Done', 'On Hold', 'Revisions', 'On-Going'].map(o => `<div class="status-opt" onclick="setUiuxStatus(${idx},'${o}',event)"><span class="sopt-dot" style="background:${o === 'Done' ? 'var(--done)' : o === 'On Hold' ? 'var(--onhold)' : 'var(--revision)'}"></span>${o}</div>`).join('');
       return `<div class="status-select-wrap"><div class="status-badge ${statusCls(s)}" onclick="toggleUiuxDrop(${idx},event)"><span class="badge-dot"></span>${escHtml(s)}</div><div class="status-dropdown" id="uiux-sdrop-${idx}">${opts}</div></div>`;
     }
 
@@ -4361,7 +4369,7 @@
     }
 
     function badgeHtml(s, idx) {
-      const opts = ['Done', 'On Hold', 'Revisions'].map(o => `<div class="status-opt" onclick="setStatus(${idx},'${o}',event)"><span class="sopt-dot" style="background:${o === 'Done' ? 'var(--done)' : o === 'On Hold' ? 'var(--onhold)' : 'var(--revision)'}"></span>${o}</div>`).join('');
+      const opts = ['Done', 'On Hold', 'Revisions', 'On-Going'].map(o => `<div class="status-opt" onclick="setStatus(${idx},'${o}',event)"><span class="sopt-dot" style="background:${o === 'Done' ? 'var(--done)' : o === 'On Hold' ? 'var(--onhold)' : 'var(--revision)'}"></span>${o}</div>`).join('');
       return `<div class="status-select-wrap"><div class="status-badge ${statusCls(s)}" onclick="toggleDrop(${idx},event)"><span class="badge-dot"></span>${escHtml(s)}</div><div class="status-dropdown" id="sdrop-${idx}">${opts}</div></div>`;
     }
 
@@ -4586,8 +4594,14 @@
       document.getElementById('export-dropdown').classList.remove('open');
       showLoading('Generating PDF…');
 
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const {
+        jsPDF
+      } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });
 
       const visible = rows.filter((_, i) => {
         const tr = document.getElementById('row-' + i);
@@ -4637,20 +4651,36 @@
 
         // Right side meta
         const now = new Date();
-        const dateStr = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        const dateStr = now.toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric'
+        });
         doc.setFontSize(7);
-        doc.text(`Exported: ${dateStr}`, pageW - 14, 11, { align: 'right' });
-        doc.text(`${visible.length} record${visible.length !== 1 ? 's' : ''} · Page ${pageNum} of ${totalPages}`, pageW - 14, 17, { align: 'right' });
+        doc.text(`Exported: ${dateStr}`, pageW - 14, 11, {
+          align: 'right'
+        });
+        doc.text(`${visible.length} record${visible.length !== 1 ? 's' : ''} · Page ${pageNum} of ${totalPages}`, pageW - 14, 17, {
+          align: 'right'
+        });
 
         // Summary pills (only on page 1)
         if (pageNum === 1) {
           const doneCount = visible.filter(r => r.status === 'Done').length;
           const holdCount = visible.filter(r => r.status === 'On Hold').length;
           const revCount = visible.filter(r => r.status === 'Revisions').length;
-          const pills = [
-            { label: `Done  ${doneCount}`, color: [90, 154, 106] },
-            { label: `On Hold  ${holdCount}`, color: [176, 128, 32] },
-            { label: `Revisions  ${revCount}`, color: [201, 96, 112] },
+          const pills = [{
+              label: `Done  ${doneCount}`,
+              color: [90, 154, 106]
+            },
+            {
+              label: `On Hold  ${holdCount}`,
+              color: [176, 128, 32]
+            },
+            {
+              label: `Revisions  ${revCount}`,
+              color: [201, 96, 112]
+            },
           ];
           let px = 16;
           doc.setFontSize(6.5);
@@ -4672,15 +4702,21 @@
       };
 
       // Build table data
-      const head = [[
-        'Client', 'Stage', 'Proposal Remarks',
-        'UI/UX', 'UI/UX Due',
-        'Dev', 'FE%', 'BE%', 'Dev Status', 'Dev Due',
-        'Status', 'Deploy', 'Final Due', 'Final Remarks'
-      ]];
+      const head = [
+        [
+          'Client', 'Stage', 'Proposal Remarks',
+          'UI/UX', 'UI/UX Due',
+          'Dev', 'FE%', 'BE%', 'Dev Status', 'Dev Due',
+          'Status', 'Deploy', 'Final Due', 'Final Remarks'
+        ]
+      ];
 
       const body = visible.map(r => {
-        const fmtDate = d => d ? new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+        const fmtDate = d => d ? new Date(d + 'T00:00:00').toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        }) : '—';
         return [
           (r.client || '') + (r.tag ? `\n${r.tag}` : ''),
           r.stage || '',
@@ -4709,12 +4745,20 @@
         head,
         body,
         startY: 33,
-        margin: { left: 8, right: 8 },
+        margin: {
+          left: 8,
+          right: 8
+        },
         tableWidth: 'auto',
         styles: {
           font: 'helvetica',
           fontSize: 7,
-          cellPadding: { top: 3.5, bottom: 3.5, left: 3, right: 3 },
+          cellPadding: {
+            top: 3.5,
+            bottom: 3.5,
+            left: 3,
+            right: 3
+          },
           valign: 'middle',
           overflow: 'linebreak',
           textColor: [61, 43, 34],
@@ -4727,26 +4771,75 @@
           textColor: [122, 92, 80],
           fontStyle: 'bold',
           fontSize: 6.5,
-          cellPadding: { top: 4, bottom: 4, left: 3, right: 3 },
+          cellPadding: {
+            top: 4,
+            bottom: 4,
+            left: 3,
+            right: 3
+          },
           halign: 'center',
         },
         columnStyles: {
-          0: { cellWidth: 22, halign: 'left' },    // Client
-          1: { cellWidth: 18, halign: 'center' },   // Stage
-          2: { cellWidth: 24, halign: 'left' },     // Proposal Remarks
-          3: { cellWidth: 22, halign: 'center' },   // UI/UX
-          4: { cellWidth: 18, halign: 'center' },   // UI/UX Due
-          5: { cellWidth: 18, halign: 'center' },   // Dev
-          6: { cellWidth: 12, halign: 'center' },   // FE%
-          7: { cellWidth: 12, halign: 'center' },   // BE%
-          8: { cellWidth: 22, halign: 'center' },   // Dev Status
-          9: { cellWidth: 18, halign: 'center' },   // Dev Due
-          10: { cellWidth: 18, halign: 'center' },   // Status
-          11: { cellWidth: 18, halign: 'center' },   // Deploy
-          12: { cellWidth: 18, halign: 'center' },   // Final Due
-          13: { cellWidth: 'auto', halign: 'left' }, // Final Remarks
+          0: {
+            cellWidth: 22,
+            halign: 'left'
+          }, // Client
+          1: {
+            cellWidth: 18,
+            halign: 'center'
+          }, // Stage
+          2: {
+            cellWidth: 24,
+            halign: 'left'
+          }, // Proposal Remarks
+          3: {
+            cellWidth: 22,
+            halign: 'center'
+          }, // UI/UX
+          4: {
+            cellWidth: 18,
+            halign: 'center'
+          }, // UI/UX Due
+          5: {
+            cellWidth: 18,
+            halign: 'center'
+          }, // Dev
+          6: {
+            cellWidth: 12,
+            halign: 'center'
+          }, // FE%
+          7: {
+            cellWidth: 12,
+            halign: 'center'
+          }, // BE%
+          8: {
+            cellWidth: 22,
+            halign: 'center'
+          }, // Dev Status
+          9: {
+            cellWidth: 18,
+            halign: 'center'
+          }, // Dev Due
+          10: {
+            cellWidth: 18,
+            halign: 'center'
+          }, // Status
+          11: {
+            cellWidth: 18,
+            halign: 'center'
+          }, // Deploy
+          12: {
+            cellWidth: 18,
+            halign: 'center'
+          }, // Final Due
+          13: {
+            cellWidth: 'auto',
+            halign: 'left'
+          }, // Final Remarks
         },
-        alternateRowStyles: { fillColor: [255, 252, 250] },
+        alternateRowStyles: {
+          fillColor: [255, 252, 250]
+        },
         rowPageBreak: 'avoid',
 
         // Draw header on every new page
@@ -4763,7 +4856,9 @@
           doc.setFontSize(6);
           doc.setTextColor(160, 128, 112);
           doc.text('Operations Monitoring · Web Development Pipeline', 8, pageH - 4);
-          doc.text(`Page ${pageNum}`, pageW - 8, pageH - 4, { align: 'right' });
+          doc.text(`Page ${pageNum}`, pageW - 8, pageH - 4, {
+            align: 'right'
+          });
         },
 
         didParseCell(data) {
@@ -4776,20 +4871,30 @@
 
         didDrawCell(data) {
           if (data.section !== 'body') return;
-          const { x, y, width, height } = data.cell;
+          const {
+            x,
+            y,
+            width,
+            height
+          } = data.cell;
 
           // ── Status badge (col 10)
           if (data.column.index === 10) {
             const val = data.cell.raw;
             const [r, g, b] = statusColor(val);
-            const bw = Math.min(width - 4, 20), bh = 5.5;
-            const bx = x + (width - bw) / 2, by = y + (height - bh) / 2;
+            const bw = Math.min(width - 4, 20),
+              bh = 5.5;
+            const bx = x + (width - bw) / 2,
+              by = y + (height - bh) / 2;
             doc.setFillColor(r, g, b);
             doc.roundedRect(bx, by, bw, bh, 1.5, 1.5, 'F');
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(6);
             doc.setTextColor(255, 255, 255);
-            doc.text(val, bx + bw / 2, by + bh / 2 + 0.4, { align: 'center', baseline: 'middle' });
+            doc.text(val, bx + bw / 2, by + bh / 2 + 0.4, {
+              align: 'center',
+              baseline: 'middle'
+            });
           }
 
           // ── Deployment badge (col 11)
@@ -4798,8 +4903,10 @@
             if (val && val !== '—') {
               const [r, g, b] = deployColor(val);
               const label = val === 'Deployed' ? 'Deployed' : 'Not Yet';
-              const bw = Math.min(width - 4, 22), bh = 5.5;
-              const bx = x + (width - bw) / 2, by = y + (height - bh) / 2;
+              const bw = Math.min(width - 4, 22),
+                bh = 5.5;
+              const bx = x + (width - bw) / 2,
+                by = y + (height - bh) / 2;
               doc.setFillColor(r, g, b, 0.15);
               doc.setDrawColor(r, g, b);
               doc.setLineWidth(0.3);
@@ -4807,17 +4914,28 @@
               doc.setFont('helvetica', 'bold');
               doc.setFontSize(6);
               doc.setTextColor(r, g, b);
-              doc.text(label, bx + bw / 2, by + bh / 2 + 0.4, { align: 'center', baseline: 'middle' });
+              doc.text(label, bx + bw / 2, by + bh / 2 + 0.4, {
+                align: 'center',
+                baseline: 'middle'
+              });
             }
           }
 
           // ── FE% progress bar (col 6)
           if (data.column.index === 6) {
             const val = parseInt(data.cell.raw) || 0;
-            const barW = width - 6, barH = 2.5;
-            const bx = x + 3, labelY = y + (height / 2) - 2, barY = y + (height / 2) + 2;
-            doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(61, 43, 34);
-            doc.text(`${val}%`, x + width / 2, labelY, { align: 'center', baseline: 'middle' });
+            const barW = width - 6,
+              barH = 2.5;
+            const bx = x + 3,
+              labelY = y + (height / 2) - 2,
+              barY = y + (height / 2) + 2;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(7);
+            doc.setTextColor(61, 43, 34);
+            doc.text(`${val}%`, x + width / 2, labelY, {
+              align: 'center',
+              baseline: 'middle'
+            });
             doc.setFillColor(232, 213, 196);
             doc.roundedRect(bx, barY, barW, barH, 1, 1, 'F');
             if (val > 0) {
@@ -4829,10 +4947,18 @@
           // ── BE% progress bar (col 7)
           if (data.column.index === 7) {
             const val = parseInt(data.cell.raw) || 0;
-            const barW = width - 6, barH = 2.5;
-            const bx = x + 3, labelY = y + (height / 2) - 2, barY = y + (height / 2) + 2;
-            doc.setFont('helvetica', 'bold'); doc.setFontSize(7); doc.setTextColor(61, 43, 34);
-            doc.text(`${val}%`, x + width / 2, labelY, { align: 'center', baseline: 'middle' });
+            const barW = width - 6,
+              barH = 2.5;
+            const bx = x + 3,
+              labelY = y + (height / 2) - 2,
+              barY = y + (height / 2) + 2;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(7);
+            doc.setTextColor(61, 43, 34);
+            doc.text(`${val}%`, x + width / 2, labelY, {
+              align: 'center',
+              baseline: 'middle'
+            });
             doc.setFillColor(232, 213, 196);
             doc.roundedRect(bx, barY, barW, barH, 1, 1, 'F');
             if (val > 0) {
@@ -5209,14 +5335,14 @@
       if (key === 'deployment_status') {
         const uiuxNotif = document.getElementById('uiux-due-notif-' + i);
         const devNotif = document.getElementById('dev-due-notif-' + i);
-        const badge = val === 'Deployed'
-          ? `<div class="due-notification safe">
+        const badge = val === 'Deployed' ?
+          `<div class="due-notification safe">
           <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
             <circle cx="12" cy="12" r="10"/>
             <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
           </svg> Deployed — on schedule
-         </div>`
-          : '';
+         </div>` :
+          '';
         if (uiuxNotif) uiuxNotif.innerHTML = val === 'Deployed' ? badge : getDueDateNotification(rows[i].uiux_due);
         if (devNotif) devNotif.innerHTML = val === 'Deployed' ? badge : getDueDateNotification(rows[i].dev_due);
       }
@@ -5720,10 +5846,10 @@
             'f-dev-assign', 'f-dev-due', 'f-fe', 'f-be', 'f-due',
             'f-prop-remark', 'f-final-remark', 'f-deployment-status'
           ]
-            .forEach(id => {
-              const el = document.getElementById(id);
-              if (el) el.value = '';
-            });
+          .forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+          });
 
           // 5. Re-draw the table and show animations
           renderTable();
@@ -5820,17 +5946,17 @@
       const overdueMap = {};
       rows.forEach(r => {
         const checks = [{
-          label: 'Final Due',
-          date: r.due
-        },
-        {
-          label: 'UI/UX Due',
-          date: r.uiux_due
-        },
-        {
-          label: 'Dev Due',
-          date: r.dev_due
-        },
+            label: 'Final Due',
+            date: r.due
+          },
+          {
+            label: 'UI/UX Due',
+            date: r.uiux_due
+          },
+          {
+            label: 'Dev Due',
+            date: r.dev_due
+          },
         ];
         checks.forEach(c => {
           if (!c.date) return;
@@ -6209,7 +6335,7 @@
     setTimeout(checkOverdueOnLoad, 800); // slight delay so table renders first
 
     // Sync theme toggle UI on load
-    (function () {
+    (function() {
       const saved = localStorage.getItem('theme') || 'light';
       const isDark = saved === 'dark';
       const sunEl = document.getElementById('theme-icon-sun');
@@ -6227,7 +6353,7 @@
     })(); // slight delay so table renders first
 
     /* ════ DRAG TO SCROLL TABLE ════ */
-    (function () {
+    (function() {
       const wrap = document.querySelector('.table-wrap');
       let isDown = false,
         startX, scrollLeft;
@@ -6258,17 +6384,39 @@
    AUTOCOMPLETE
 ════════════════════════════════════════════════ */
     const AC_NAMES = {
-      uiux: [
-        { name: 'Nicolle', color: '#c9637a' },
-        { name: 'Kent', color: '#b07060' },
+      uiux: [{
+          name: 'Nicolle',
+          color: '#c9637a'
+        },
+        {
+          name: 'Kent',
+          color: '#b07060'
+        },
       ],
-      dev: [
-        { name: 'Anthony', color: '#5a9a6a' },
-        { name: 'Adrian', color: '#6a7ab0' },
-        { name: 'Ahadon', color: '#b08020' },
-        { name: 'Kef', color: '#c9637a' },
-        { name: 'John', color: '#7a6ab0' },
-        { name: 'Carl', color: '#b07060' },
+      dev: [{
+          name: 'Anthony',
+          color: '#5a9a6a'
+        },
+        {
+          name: 'Adrian',
+          color: '#6a7ab0'
+        },
+        {
+          name: 'Ahadon',
+          color: '#b08020'
+        },
+        {
+          name: 'Kef',
+          color: '#c9637a'
+        },
+        {
+          name: 'John',
+          color: '#7a6ab0'
+        },
+        {
+          name: 'Carl',
+          color: '#b07060'
+        },
       ],
     };
     AC_NAMES.all = [...AC_NAMES.uiux, ...AC_NAMES.dev];
@@ -6280,7 +6428,10 @@
       const q = inp.value.trim().toLowerCase();
       const list = AC_NAMES[group] || AC_NAMES.all;
       const filtered = q ? list.filter(n => n.name.toLowerCase().includes(q)) : list;
-      if (!filtered.length) { drop.classList.remove('open'); return; }
+      if (!filtered.length) {
+        drop.classList.remove('open');
+        return;
+      }
       const roleLabel = group === 'uiux' ? 'UI/UX Designer' : 'Developer';
       drop.innerHTML = filtered.map(n => `
     <div class="ac-option" onmousedown="acPick('${inputId}','${dropId}','${n.name}')">
@@ -6303,7 +6454,6 @@
     function acClose(dropId) {
       document.getElementById(dropId)?.classList.remove('open');
     }
-    
   </script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
