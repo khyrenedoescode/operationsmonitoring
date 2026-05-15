@@ -56,7 +56,7 @@ class OperationController extends Controller
             'dev_be' => 'nullable|string|in:,Done,In Progress,Pending',
             'fe' => 'nullable|integer|min:0|max:100',
             'be' => 'nullable|integer|min:0|max:100',
-            'status' => 'required|in:Done,On Hold,Revisions',
+            'status' => 'required|in:Done,On Hold,Revisions,On-Going',
             'uiux_due' => 'nullable|date',
             'dev_due' => 'nullable|date',
             'due' => 'nullable|date',
@@ -118,7 +118,7 @@ class OperationController extends Controller
             'value' => match ($field) {
                 'fe', 'be' => 'required|integer|min:0|max:100',
                 'stage' => 'required|in:Homepage,Sitemap,All Pages,Final Homepage',
-                'status' => 'required|in:Done,On Hold,Revisions',
+                'status' => 'required|in:Done,On Hold,Revisions,On-Going',
                 'dev_fe', 'dev_be' => 'nullable|string',
                 'due' => 'nullable|date',
                 default => 'nullable|string|max:1000',

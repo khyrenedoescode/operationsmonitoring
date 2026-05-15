@@ -982,6 +982,11 @@
       border-color: var(--done);
     }
 
+    .fpill.active.f-ongoing {
+      background: var(--accent2);
+      border-color: var(--accent2);
+    }
+
     .filter-clear {
       padding: 5px 11px;
       border-radius: 999px;
@@ -3722,6 +3727,7 @@
         <div class="fpill f-done" onclick="toggleFilter('uiux_status','Done')" id="fpill-uiux-done">Done</div>
         <div class="fpill f-hold" onclick="toggleFilter('uiux_status','On Hold')" id="fpill-uiux-hold">On Hold</div>
         <div class="fpill f-rev" onclick="toggleFilter('uiux_status','Revisions')" id="fpill-uiux-rev">Revisions</div>
+        <div class="fpill f-ongoing" onclick="toggleFilter('uiux_status','On-Going')" id="fpill-uiux-ongoing">On-Going</div>
       </div>
       <div class="filter-divider"></div>
       <span class="filter-label">Dev</span>
@@ -3729,12 +3735,13 @@
         <div class="fpill f-done" onclick="toggleFilter('dev_status','Done')" id="fpill-dev-done">Done</div>
         <div class="fpill f-hold" onclick="toggleFilter('dev_status','On Hold')" id="fpill-dev-hold">On Hold</div>
         <div class="fpill f-rev" onclick="toggleFilter('dev_status','Revisions')" id="fpill-dev-rev">Revisions</div>
+        <div class="fpill f-ongoing" onclick="toggleFilter('dev_status','On-Going')" id="fpill-dev-ongoing">On-Going</div>
       </div>
       <div class="filter-divider"></div>
       <span class="filter-label">Stage</span>
       <div class="filter-pills">
-        <div class="fpill" onclick="toggleFilter('stage','Homepage')" id="fpill-hp">Homepage</div>
         <div class="fpill" onclick="toggleFilter('stage','Sitemap')" id="fpill-sm">Sitemap</div>
+        <div class="fpill" onclick="toggleFilter('stage','Homepage')" id="fpill-hp">Homepage</div>
         <div class="fpill" onclick="toggleFilter('stage','All Pages')" id="fpill-ap">All Pages</div>
         <div class="fpill" onclick="toggleFilter('stage','Final Homepage')" id="fpill-fh">Final</div>
       </div>
@@ -5211,17 +5218,19 @@
       const uiuxPillMap = {
         'Done': 'fpill-uiux-done',
         'On Hold': 'fpill-uiux-hold',
-        'Revisions': 'fpill-uiux-rev'
+        'Revisions': 'fpill-uiux-rev',
+        'On-Going': 'fpill-uiux-ongoing'
       };
       const devPillMap = {
         'Done': 'fpill-dev-done',
         'On Hold': 'fpill-dev-hold',
-        'Revisions': 'fpill-dev-rev'
+        'Revisions': 'fpill-dev-rev',
+        'On-Going': 'fpill-dev-ongoing'
       };
 
       let idsToClear = [];
-      if (type === 'uiux_status') idsToClear = ['fpill-uiux-done', 'fpill-uiux-hold', 'fpill-uiux-rev'];
-      else if (type === 'dev_status') idsToClear = ['fpill-dev-done', 'fpill-dev-hold', 'fpill-dev-rev'];
+      if (type === 'uiux_status') idsToClear = ['fpill-uiux-done', 'fpill-uiux-hold', 'fpill-uiux-rev', 'fpill-uiux-ongoing'];
+      else if (type === 'dev_status') idsToClear = ['fpill-dev-done', 'fpill-dev-hold', 'fpill-dev-rev', 'fpill-dev-ongoing'];
       else idsToClear = ['fpill-hp', 'fpill-sm', 'fpill-ap', 'fpill-fh'];
 
       idsToClear.forEach(id => document.getElementById(id)?.classList.remove('active'));
@@ -5274,7 +5283,7 @@
       activeFilters.uiux_status = null;
       activeFilters.dev_status = null;
       activeFilters.stage = null;
-      ['fpill-uiux-done', 'fpill-uiux-hold', 'fpill-uiux-rev', 'fpill-dev-done', 'fpill-dev-hold', 'fpill-dev-rev', 'fpill-hp', 'fpill-sm', 'fpill-ap', 'fpill-fh'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+      ['fpill-uiux-done', 'fpill-uiux-hold', 'fpill-uiux-rev', 'fpill-uiux-ongoing', 'fpill-dev-done', 'fpill-dev-hold', 'fpill-dev-rev', 'fpill-dev-ongoing', 'fpill-hp', 'fpill-sm', 'fpill-ap', 'fpill-fh'].forEach(id => document.getElementById(id)?.classList.remove('active'));
       applyFilters();
     }
 
