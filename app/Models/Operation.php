@@ -39,9 +39,9 @@ class Operation extends Model
     protected $casts = [
         'fe' => 'integer',
         'be' => 'integer',
-        'due' => 'date',
-        'uiux_due' => 'date',
-        'dev_due' => 'date',
+        'due' => 'date:Y-m-d',
+        'uiux_due' => 'date:Y-m-d',
+        'dev_due' => 'date:Y-m-d',
         'is_archived' => 'boolean',
         'archived_at' => 'datetime',
     ];

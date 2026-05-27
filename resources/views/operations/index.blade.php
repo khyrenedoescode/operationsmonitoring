@@ -3742,8 +3742,8 @@
       <div class="filter-pills">
         <div class="fpill" onclick="toggleFilter('stage','Sitemap')" id="fpill-sm">Sitemap</div>
         <div class="fpill" onclick="toggleFilter('stage','Homepage')" id="fpill-hp">Homepage</div>
-        <div class="fpill" onclick="toggleFilter('stage','All Pages')" id="fpill-ap">All Pages</div>
         <div class="fpill" onclick="toggleFilter('stage','Final Homepage')" id="fpill-fh">Final</div>
+        <div class="fpill" onclick="toggleFilter('stage','All Pages')" id="fpill-ap">All Pages</div>
       </div>
       <button class="filter-clear" id="filter-clear" onclick="clearFilters()">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -3981,8 +3981,8 @@
             <select id="f-stage">
               <option>Sitemap</option>
               <option>Homepage</option>
-              <option>All Pages</option>
               <option>Final Homepage</option>
+              <option>All Pages</option>
             </select>
           </div>
           <div class="form-group">
@@ -4213,7 +4213,7 @@
     /* ════════════════════════════════════════════════
        CONFIG
     ════════════════════════════════════════════════ */
-    const STAGES = ['Sitemap', 'Homepage', 'All Pages', 'Final Homepage'];
+    const STAGES = ['Sitemap', 'Homepage', 'Final Homepage', 'All Pages'];
     const AV_COLORS = ['av1', 'av2', 'av3', 'av4'];
     const CSRF = document.querySelector('meta[name="csrf-token"]').content;
     const ROUTES = {
@@ -4237,6 +4237,28 @@
     let archived = JSON.parse('<?= json_encode($archived, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>');
     let activityLog = JSON.parse('<?= json_encode($logs, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>');
     let pendingDeleteIdx = null;
+
+    // Add this cleanup right after:
+    rows = rows.map(r => ({
+      ...r,
+      due: r.due ? r.due.split(' ')[0] : '',
+      uiux_due: r.uiux_due ? r.uiux_due.split(' ')[0] : '',
+      dev_due: r.dev_due ? r.dev_due.split(' ')[0] : '',
+    }));
+
+    trash = trash.map(r => ({
+      ...r,
+      due: r.due ? r.due.split(' ')[0] : '',
+      uiux_due: r.uiux_due ? r.uiux_due.split(' ')[0] : '',
+      dev_due: r.dev_due ? r.dev_due.split(' ')[0] : '',
+    }));
+
+    archived = archived.map(r => ({
+      ...r,
+      due: r.due ? r.due.split(' ')[0] : '',
+      uiux_due: r.uiux_due ? r.uiux_due.split(' ')[0] : '',
+      dev_due: r.dev_due ? r.dev_due.split(' ')[0] : '',
+    }));
 
     // Sort state
     let sortKey = null;
@@ -4393,8 +4415,9 @@
     }
 
     function finalDateFmt(d) {
-      if (!d) return '';
+      if (!d || d === 'null' || d === 'undefined' || String(d).trim() === '') return '';
       const dt = new Date(d + 'T00:00:00');
+      if (isNaN(dt.getTime())) return '';
       return `${String(dt.getDate()).padStart(2, '0')}/${String(dt.getMonth() + 1).padStart(2, '0')}/${dt.getFullYear()}`;
     }
 
@@ -5212,8 +5235,8 @@
       const pillMap = {
         'Homepage': 'fpill-hp',
         'Sitemap': 'fpill-sm',
-        'All Pages': 'fpill-ap',
-        'Final Homepage': 'fpill-fh'
+        'Final Homepage': 'fpill-fh',
+        'All Pages': 'fpill-ap'
       };
       const uiuxPillMap = {
         'Done': 'fpill-uiux-done',

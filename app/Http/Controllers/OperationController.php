@@ -26,9 +26,22 @@ class OperationController extends Controller
                 return $op;
             });
 
-        $trash = Operation::where('user_id', $userId)->onlyTrashed()->orderBy('deleted_at', 'desc')->get();
-        $archived = Operation::where('user_id', $userId)->where('is_archived', true)->orderBy('archived_at', 'desc')->get();
-        
+        $trash = Operation::where('user_id', $userId)->onlyTrashed()->orderBy('deleted_at', 'desc')->get()
+            ->map(function ($op) {
+                $op->due = $op->due ? $op->due->format('Y-m-d') : null;
+                $op->uiux_due = $op->uiux_due ? $op->uiux_due->format('Y-m-d') : null;
+                $op->dev_due = $op->dev_due ? $op->dev_due->format('Y-m-d') : null;
+                return $op;
+            });
+
+        $archived = Operation::where('user_id', $userId)->where('is_archived', true)->orderBy('archived_at', 'desc')->get()
+            ->map(function ($op) {
+                $op->due = $op->due ? $op->due->format('Y-m-d') : null;
+                $op->uiux_due = $op->uiux_due ? $op->uiux_due->format('Y-m-d') : null;
+                $op->dev_due = $op->dev_due ? $op->dev_due->format('Y-m-d') : null;
+                return $op;
+            });
+
         // Logs usually show only the user's own activity
         $logs = ActivityLog::where('user_id', $userId)->orderBy('created_at', 'desc')->limit(200)->get();
 
@@ -88,9 +101,9 @@ class OperationController extends Controller
         ]);
 
         $responseRow = $op->toArray();
-        $responseRow['due'] = $op->getRawOriginal('due');
-        $responseRow['uiux_due'] = $op->getRawOriginal('uiux_due');
-        $responseRow['dev_due'] = $op->getRawOriginal('dev_due');
+        $responseRow['due'] = $op->due ? $op->due->format('Y-m-d') : null;
+        $responseRow['uiux_due'] = $op->uiux_due ? $op->uiux_due->format('Y-m-d') : null;
+        $responseRow['dev_due'] = $op->dev_due ? $op->dev_due->format('Y-m-d') : null;
 
         if ($request->expectsJson()) {
             return response()->json(['success' => true, 'row' => $responseRow]);
@@ -103,9 +116,24 @@ class OperationController extends Controller
     public function update(Request $request, Operation $operation)
     {
         $allowed = [
-            'client', 'tag', 'stage', 'prop_assign', 'prop_remark', 'uiux_assign', 
-            'uiux_status', 'uiux_due', 'dev_assign', 'dev_fe', 'dev_be', 'dev_due', 
-            'fe', 'be', 'status', 'due', 'final_remark', 'deployment_status',
+            'client',
+            'tag',
+            'stage',
+            'prop_assign',
+            'prop_remark',
+            'uiux_assign',
+            'uiux_status',
+            'uiux_due',
+            'dev_assign',
+            'dev_fe',
+            'dev_be',
+            'dev_due',
+            'fe',
+            'be',
+            'status',
+            'due',
+            'final_remark',
+            'deployment_status',
         ];
 
         $field = $request->input('field');
@@ -240,9 +268,9 @@ class OperationController extends Controller
         ]);
 
         $responseRow = $operation->toArray();
-        $responseRow['due'] = $operation->getRawOriginal('due');
-        $responseRow['uiux_due'] = $operation->getRawOriginal('uiux_due');
-        $responseRow['dev_due'] = $operation->getRawOriginal('dev_due');
+        $responseRow['due'] = $operation->due ? $operation->due->format('Y-m-d') : null;
+        $responseRow['uiux_due'] = $operation->uiux_due ? $operation->uiux_due->format('Y-m-d') : null;
+        $responseRow['dev_due'] = $operation->dev_due ? $operation->dev_due->format('Y-m-d') : null;
 
         return response()->json(['success' => true, 'row' => $responseRow]);
     }
