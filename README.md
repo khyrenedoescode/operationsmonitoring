@@ -107,5 +107,5 @@ AD
 </table>
 
 <p align="center">
-  <sub style="color:#a88;">Made with ♥ at Holy Cross of Davao College · RWeb Solutions</sub>
+  <sub style="color:#a88;">Made with ♥ at RWeb Solutions Corp.</sub>
 </p>
